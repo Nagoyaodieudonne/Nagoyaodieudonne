@@ -12,8 +12,13 @@ build/
 .env.development.local
 .env.production.local
 
+# Python cache
+__pycache__/
+*.pyc
+
 # IDE & OS
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+.cursor/

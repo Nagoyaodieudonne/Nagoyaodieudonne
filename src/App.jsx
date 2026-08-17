@@ -18,10 +18,21 @@ import {
   Star,
   Navigation,
   Image as ImageIcon,
+  Layers,
+  Flame,
+  Truck,
+  Eye,
+  Sliders,
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import confetti from 'canvas-confetti';
+import Lenis from 'lenis';
+
+import Canvas3D from './components/Canvas3D';
+import Card3D from './components/Card3D';
+import OrbitGallery3D from './components/OrbitGallery3D';
+import ProductModal from './components/ProductModal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -172,6 +183,8 @@ function MinimiBrandText({ className = '' }) {
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tout');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [mixerItems, setMixerItems] = useState([
     { title: 'Gift Box Kids 5.000 FCFA', subtitle: 'Cadeau N°1 TikTok • 38.1K J\'aime', color: 'from-[#FFC5D3]/60 to-[#FFE5EC]/80' },
     { title: 'Fournitures Scolaires & Rentrée', subtitle: 'Sacs, Gourdes & Papeterie tendance', color: 'from-[#C8E6C9]/60 to-[#E0F8E9]/80' },
@@ -188,17 +201,40 @@ export default function App() {
   const featuresRef = useRef(null);
   const catalogRef = useRef(null);
 
-  // 1. Scroll listener
+  // 1. Lenis Smooth Scroll with GSAP ScrollTrigger synchronization
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 80);
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      wheelMultiplier: 1.1,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+
+    const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      lenis.destroy();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   // 2. Mixer card rotation every 3s
   useEffect(() => {
     const interval = setInterval(() => {
-      setMixerItems(prev => {
+      setMixerItems((prev) => {
         const copy = [...prev];
         const last = copy.pop();
         copy.unshift(last);
@@ -215,28 +251,28 @@ export default function App() {
       setTypingText(fullText.slice(0, index));
       index++;
       if (index > fullText.length) index = 0;
-    }, 50);
+    }, 45);
     return () => clearInterval(timer);
   }, []);
 
   // 4. Schedule cursor simulation
   useEffect(() => {
     const interval = setInterval(() => {
-      setSelectedDay(prev => (prev % 7) + 1);
+      setSelectedDay((prev) => (prev % 7) + 1);
       setCursorClicked(true);
       setTimeout(() => setCursorClicked(false), 500);
     }, 2200);
     return () => clearInterval(interval);
   }, []);
 
-  // 5. GSAP animations — all inside context for proper cleanup
+  // 5. GSAP animations with context
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Hero stagger fade-up
       gsap.fromTo(
         '.hero-animate',
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.1, stagger: 0.13, ease: 'power3.out', delay: 0.2 }
+        { y: 0, opacity: 1, duration: 1.1, stagger: 0.12, ease: 'power3.out', delay: 0.15 }
       );
 
       // Features cards slide-in
@@ -244,7 +280,11 @@ export default function App() {
         '.feature-card',
         { y: 40, opacity: 0 },
         {
-          y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out',
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.15,
+          ease: 'power2.out',
           scrollTrigger: { trigger: featuresRef.current, start: 'top 80%' },
         }
       );
@@ -254,7 +294,11 @@ export default function App() {
         '.manifesto-reveal',
         { y: 35, opacity: 0 },
         {
-          y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power2.out',
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          stagger: 0.15,
+          ease: 'power2.out',
           scrollTrigger: { trigger: manifestoRef.current, start: 'top 78%' },
         }
       );
@@ -264,7 +308,12 @@ export default function App() {
         '.catalog-card',
         { y: 30, opacity: 0, scale: 0.96 },
         {
-          y: 0, opacity: 1, scale: 1, duration: 0.65, stagger: 0.1, ease: 'power2.out',
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.65,
+          stagger: 0.08,
+          ease: 'power2.out',
           scrollTrigger: { trigger: catalogRef.current, start: 'top 80%' },
         }
       );
@@ -284,7 +333,7 @@ export default function App() {
             onUpdate: (self) => {
               gsap.to(card, {
                 scale: 1 - self.progress * 0.07,
-                filter: `blur(${self.progress * 10}px)`,
+                filter: `blur(${self.progress * 8}px)`,
                 opacity: 1 - self.progress * 0.35,
                 duration: 0.05,
               });
@@ -299,436 +348,428 @@ export default function App() {
     return () => ctx.revert();
   }, []);
 
-  const handleOrderWhatsApp = (productName = '') => {
+  const triggerConfetti = () => {
     confetti({
-      particleCount: 100,
-      spread: 80,
-      origin: { y: 0.65 },
-      colors: ['#FF8BA7', '#FFD166', '#95D5B2', '#B5A4D4', '#74C0FC'],
+      particleCount: 70,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#FF477E', '#FF8BA7', '#C8963E', '#95D5B2'],
     });
-    const msg = productName
-      ? `Bonjour minimi 💕 ! Je viens depuis votre site et souhaite commander : ${productName}. Est-ce disponible en boutique à Cotonou ?`
-      : `Bonjour minimi 💕 ! Je souhaite découvrir vos articles ou passer une commande. Pouvez-vous m'aider ?`;
-    window.open(`https://wa.me/2290191618707?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const filteredProducts = activeCategory === 'Tout'
-    ? PRODUCTS
-    : PRODUCTS.filter(p => p.category === activeCategory);
+  const filteredProducts =
+    activeCategory === 'Tout'
+      ? PRODUCTS
+      : PRODUCTS.filter((p) => p.category === activeCategory);
+
+  const categories = ['Tout', 'Coffrets', 'Papeterie', 'Lifestyle', 'Sacs', 'Jouets'];
 
   return (
-    <div className="relative min-h-screen bg-[#FFFDF9] text-[#2D1F2D] overflow-hidden">
-      {/* Global Noise Overlay */}
-      <div className="noise-overlay" />
+    <div className="relative min-h-screen bg-[#FFFDF9] text-[#2D1F2D] overflow-x-hidden selection:bg-[#FF477E] selection:text-white">
+      {/* 1. Global SVG Noise Texture */}
+      <div className="noise-overlay" aria-hidden="true" />
 
-      {/* Soft Ambient Glows */}
-      <div className="fixed top-[-8%] left-[-8%] w-[500px] h-[500px] bg-[#FFC5D3]/20 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-8%] right-[-8%] w-[500px] h-[500px] bg-[#BDE0FE]/20 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="fixed top-[40%] right-[10%] w-[300px] h-[300px] bg-[#FFD166]/15 rounded-full blur-[100px] pointer-events-none z-0" />
+      {/* 2. Interactive Three.js 3D WebGL Ambient Engine */}
+      <Canvas3D />
 
-      {/* ===== A. NAVBAR "L'Île Flottante" ===== */}
-      <header className="fixed top-5 left-0 right-0 z-50 flex justify-center px-4">
-        <nav className={`flex items-center justify-between gap-4 px-5 py-3 rounded-full transition-all duration-500 max-w-4xl w-full ${
+      {/* 3. Floating Pill Island Navbar */}
+      <header
+        className={`fixed top-4 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 w-[92%] max-w-5xl ${
           scrolled
-            ? 'bg-[#FFFDF9]/96 backdrop-blur-2xl border border-[#FF8BA7]/35 shadow-lg'
-            : 'bg-white/85 backdrop-blur-md border border-[#FF8BA7]/20 shadow-sm'
-        }`}>
-          {/* Logo */}
-          <a href="#" className="flex items-center gap-2.5 group flex-shrink-0">
-            <img
-              src="/logo-minimi.jpg"
-              alt="minimi logo"
-              className="w-9 h-9 rounded-full object-cover shadow-md group-hover:scale-110 transition-transform duration-300"
-            />
-            <MinimiBrandText className="text-xl" />
+            ? 'bg-white/85 backdrop-blur-xl shadow-xl border border-[#FF8BA7]/30 py-2.5 px-6 rounded-full'
+            : 'bg-white/60 backdrop-blur-md py-3 px-6 rounded-full border border-white/50 shadow-sm'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2 group">
+            <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF8BA7] to-[#FF477E] flex items-center justify-center text-white text-base shadow-sm group-hover:scale-110 transition-transform">
+              ✨
+            </span>
+            <div className="flex flex-col">
+              <MinimiBrandText className="text-xl" />
+              <span className="text-[10px] font-mono text-[#6E5D6E] -mt-1 tracking-wider uppercase">
+                Cotonou Concept Store
+              </span>
+            </div>
           </a>
 
           {/* Nav Links */}
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium text-[#5C4456]">
-            {[['#features', 'Nos Univers'], ['#manifesto', 'Notre Mission'], ['#protocole', 'Commander'], ['#boutique', 'Boutique']].map(([href, label]) => (
-              <a key={href} href={href} className="hover:text-[#FF477E] transition-colors hover:-translate-y-0.5 transform inline-block duration-200">
-                {label}
-              </a>
-            ))}
-          </div>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#2D1F2D]">
+            <a href="#3d-orbit" className="hover:text-[#FF477E] transition-colors flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-[#FF477E]" /> Vitrine 3D
+            </a>
+            <a href="#catalogue" className="hover:text-[#FF477E] transition-colors">
+              Catalogue
+            </a>
+            <a href="#artefacts" className="hover:text-[#FF477E] transition-colors">
+              Expérience
+            </a>
+            <a href="#boutique" className="hover:text-[#FF477E] transition-colors">
+              La Boutique
+            </a>
+          </nav>
 
-          {/* CTA */}
-          <button
-            id="nav-whatsapp-cta"
-            onClick={() => handleOrderWhatsApp()}
-            className="btn-magnetic flex-shrink-0 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#FF477E] to-[#FFD166] text-white font-semibold text-xs tracking-wide uppercase shadow-pink-glow"
-          >
-            <div className="btn-magnetic-fill" />
-            <span className="btn-magnetic-content flex items-center gap-1.5">
-              <MessageCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">WhatsApp</span>
-            </span>
-          </button>
-        </nav>
-      </header>
-
-      {/* ===== B. HERO — concept store kids ===== */}
-      <section
-        ref={heroRef}
-        className="relative min-h-[100dvh] flex flex-col justify-end pt-28 pb-14 px-6 lg:px-16 overflow-hidden"
-        style={{ background: 'linear-gradient(160deg, #FFF5F7 0%, #FFFDF9 50%, #F0FAFF 100%)' }}
-      >
-        {/* Hero Background Image — VISIBLE */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/hero-bg.jpg"
-            alt="minimi concept store kids articles mignons Cotonou"
-            className="w-full h-full object-cover object-center opacity-55"
-            style={{ objectPosition: 'center 30%' }}
-          />
-          {/* Gradient overlay — lighter to keep image visible */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FFFDF9]/95 via-[#FFFDF9]/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#FFFDF9] via-transparent to-transparent" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-6xl mx-auto w-full">
-          {/* Badge */}
-          <div className="hero-animate inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md border border-[#FF8BA7]/30 shadow-sm mb-5">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF477E] opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF477E]" />
-            </span>
-            <span className="text-xs font-mono tracking-wider uppercase text-[#FF477E] font-bold">
-              🌈 Concept Store Kids & Ado • Cotonou, Bénin • TikTok @minimistore0
-            </span>
-          </div>
-
-          {/* Title */}
-          <h1 className="mb-5 max-w-3xl">
-            <span className="hero-animate block text-[#2D1F2D] font-sans font-extrabold text-4xl sm:text-6xl lg:text-7xl uppercase tracking-tight leading-[1.05]">
-              minimi
-            </span>
-            <span className="hero-animate block font-serif italic font-normal text-gradient-kawaii text-3xl sm:text-5xl lg:text-6xl mt-1 leading-tight">
-              concept store kids & ado 🌈
-            </span>
-          </h1>
-
-          {/* Description — brand mission */}
-          <p className="hero-animate text-base sm:text-lg text-[#5C4456] max-w-xl font-light leading-relaxed mb-3">
-            La boutique dédiée aux <strong className="text-[#FF477E]">enfants & adolescents</strong> de Cotonou. 
-            Une sélection d'articles <strong className="text-[#C8963E]">tendances, pratiques & ludiques</strong> tout au long de l'année.
-          </p>
-          <p className="hero-animate text-sm text-[#7A6A7A] max-w-xl leading-relaxed mb-8">
-            Fournitures scolaires, sacs, gourdes, jouets, accessoires, cadeaux, articles de vacances et bien plus encore — selon les saisons. (<a href="https://www.tiktok.com/@minimistore0" target="_blank" rel="noreferrer" className="text-[#FF477E] font-bold underline">@minimistore0</a>)
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="hero-animate flex flex-wrap items-center gap-4 mb-10">
-            <button
-              id="hero-whatsapp-btn"
-              onClick={() => handleOrderWhatsApp()}
-              className="btn-magnetic px-7 py-4 rounded-full bg-gradient-to-r from-[#FF477E] via-[#FF8BA7] to-[#FFD166] text-white font-bold text-sm tracking-wide uppercase shadow-pink-glow hover:shadow-xl transition-all"
-            >
-              <div className="btn-magnetic-fill" />
-              <span className="btn-magnetic-content flex items-center gap-2.5">
-                <MessageCircle className="w-5 h-5" />
-                <span>Commander sur WhatsApp</span>
-              </span>
-            </button>
+          {/* Direct CTA */}
+          <div className="flex items-center gap-2">
             <a
-              href="https://www.tiktok.com/@minimistore0"
+              href="https://wa.me/2290191618707?text=Bonjour%20MiNiMi%20Store%20!%20Je%20veux%20découvrir%20vos%20articles%20💕"
               target="_blank"
               rel="noreferrer"
-              id="hero-tiktok-btn"
-              className="px-7 py-4 rounded-full bg-white/90 hover:bg-[#FFF5F7] border border-[#FF8BA7]/40 text-[#2D1F2D] font-bold text-sm tracking-wide transition-all flex items-center gap-2 shadow-sm hover:-translate-y-0.5"
+              onClick={triggerConfetti}
+              className="btn-magnetic px-4 py-2 rounded-full bg-gradient-to-r from-[#FF477E] to-[#C8963E] text-white text-xs md:text-sm font-bold shadow-md shadow-pink-500/20 flex items-center gap-1.5"
             >
-              <Video className="w-4 h-4 text-[#FF477E]" />
-              <span>Voir sur TikTok</span>
+              <span className="btn-magnetic-fill" />
+              <span className="btn-magnetic-content flex items-center gap-1.5">
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp</span>
+              </span>
             </a>
           </div>
+        </div>
+      </header>
 
-          {/* Stats Row */}
-          <div className="hero-animate grid grid-cols-3 gap-4 pt-6 border-t border-[#FF8BA7]/20 max-w-xl">
-            {[
-              { icon: <Video className="w-4 h-4" />, value: '7.4K+', label: 'Followers TikTok', color: '#FF477E' },
-              { icon: <Heart className="w-4 h-4 fill-current" />, value: '38.1K', label: 'J\'aime TikTok', color: '#FF8BA7' },
-              { icon: <MapPin className="w-4 h-4" />, value: 'Cotonou', label: 'Boutique physique', color: '#C8963E' },
-            ].map((stat, i) => (
-              <div key={i} className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${stat.color}15`, color: stat.color, border: `1px solid ${stat.color}30` }}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <p className="font-mono text-base font-bold text-[#2D1F2D]">{stat.value}</p>
-                  <p className="text-[10px] text-[#6E5D6E]">{stat.label}</p>
-                </div>
+      {/* 4. HERO SECTION ("Le Plan d'Ouverture 3D") */}
+      <section
+        ref={heroRef}
+        className="relative min-h-[92dvh] md:min-h-screen flex items-center justify-center pt-28 pb-16 px-4"
+      >
+        <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10">
+          {/* Left Column : Massive Typography & Narrative */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="hero-animate inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#FF8BA7]/40 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#FF477E] animate-ping" />
+              <span className="text-xs font-mono font-bold text-[#FF477E]">
+                🔥 38.1K J'AIME SUR TIKTOK • @MINIMISTORE0
+              </span>
+            </div>
+
+            <h1 className="hero-animate text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#2D1F2D] leading-[1.08]">
+              Le Mini Monde le plus{' '}
+              <span className="font-serif italic font-normal text-gradient-kawaii block sm:inline">
+                mignon & magique
+              </span>{' '}
+              de Cotonou.
+            </h1>
+
+            <p className="hero-animate text-base sm:text-lg text-[#6E5D6E] max-w-xl font-normal leading-relaxed">
+              Boutique physique & en ligne dédiée aux trésors d'organisation :{' '}
+              <strong className="text-[#2D1F2D]">Gift Box à 5.000 FCFA</strong>, papeterie pastel, sacs tendance, jouets et gourdes kawaii pour enfants & ados.
+            </p>
+
+            {/* CTAs */}
+            <div className="hero-animate flex flex-wrap items-center gap-3 pt-2">
+              <a
+                href="#3d-orbit"
+                onClick={triggerConfetti}
+                className="btn-magnetic px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FF477E] via-[#FF8BA7] to-[#C8963E] text-white font-bold text-sm sm:text-base shadow-lg shadow-pink-500/25 flex items-center gap-2"
+              >
+                <span className="btn-magnetic-fill" />
+                <span className="btn-magnetic-content flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Explorer les Best-Sellers 3D</span>
+                </span>
+              </a>
+
+              <a
+                href="https://www.tiktok.com/@minimistore0"
+                target="_blank"
+                rel="noreferrer"
+                className="px-5 py-3.5 rounded-2xl bg-white/90 backdrop-blur-md border border-[#FF8BA7]/30 text-[#2D1F2D] font-bold text-sm sm:text-base shadow-sm hover:border-[#FF477E] transition-all flex items-center gap-2"
+              >
+                <Video className="w-4 h-4 text-[#FF477E]" />
+                <span>Voir sur TikTok</span>
+              </a>
+            </div>
+
+            {/* Trust Monospace Indicators */}
+            <div className="hero-animate pt-4 flex flex-wrap gap-4 text-xs font-mono text-[#6E5D6E]">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#95D5B2]" />
+                <span>Gift Box dès 5.000 FCFA</span>
               </div>
-            ))}
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#95D5B2]" />
+                <span>Livraison express Cotonou</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#95D5B2]" />
+                <span>Boutique Carrefour des Policiers</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column : 3D Interactive Hero Card */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="hero-animate w-full max-w-md">
+              <Card3D depth={40} className="w-full">
+                <div className="relative rounded-4xl p-5 glass-card-pink border-2 border-white shadow-2xl overflow-hidden">
+                  {/* Top Badge */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#FF477E] text-white shadow-sm flex items-center gap-1">
+                      <Flame className="w-3.5 h-3.5" /> Best-Seller N°1
+                    </span>
+                    <span className="text-xs font-mono font-bold text-[#C8963E] bg-white/90 px-2.5 py-1 rounded-full">
+                      5.000 FCFA
+                    </span>
+                  </div>
+
+                  {/* Main Product Image with 3D Depth */}
+                  <div className="relative w-full h-[240px] sm:h-[280px] rounded-3xl overflow-hidden mb-4 bg-white/70 shadow-inner">
+                    <img
+                      src="/p-giftbox.jpg"
+                      alt="Coffret Cadeau MiNiMi 5000 FCFA"
+                      className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-3 text-white">
+                      <p className="text-xs font-mono opacity-90">Offre TikTok Spéciale</p>
+                      <h4 className="font-cute font-bold text-lg">Coffret Cadeau Kawaii Complet</h4>
+                    </div>
+                  </div>
+
+                  {/* Quick features in card */}
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-[#FF8BA7]/20 flex items-center gap-2">
+                      <Gift className="w-4 h-4 text-[#FF477E]" />
+                      <span className="font-medium text-[#2D1F2D]">Emballage inclus</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-white/90 border border-[#FF8BA7]/20 flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-[#C8963E]" />
+                      <span className="font-medium text-[#2D1F2D]">Livraison du jour</span>
+                    </div>
+                  </div>
+
+                  {/* 1-Click Order Button */}
+                  <button
+                    onClick={() => setSelectedProduct(PRODUCTS[0])}
+                    className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#FF477E] to-[#C8963E] text-white font-bold text-sm shadow-md hover:scale-[1.02] active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Commander ce Coffret (5.000 FCFA)</span>
+                  </button>
+                </div>
+              </Card3D>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ===== C. FEATURES — 3 Artefacts interactifs ===== */}
-      <section id="features" ref={featuresRef} className="py-24 px-6 lg:px-16 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="font-mono text-xs text-[#FF477E] uppercase tracking-widest bg-[#FFF0F5] px-4 py-1.5 rounded-full border border-[#FF8BA7]/30 font-bold">
-            3 Raisons de choisir minimi
+      {/* 5. 3D ORBIT SHOWCASE SECTION ("La Vitrine Orbitale 3D") */}
+      <section id="3d-orbit" className="relative py-20 px-4 bg-gradient-to-b from-transparent via-[#FFF0F3]/40 to-transparent">
+        <div className="max-w-5xl mx-auto text-center mb-8">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E] mb-3">
+            <Layers className="w-3.5 h-3.5" /> INTERACTION 3D EN DIRECT
           </span>
-          <h2 className="text-3xl sm:text-5xl font-bold mt-4 tracking-tight text-[#2D1F2D]">
-            Un univers coloré pensé pour les jeunes ✨
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#2D1F2D] font-sans tracking-tight">
+            Explorez notre vitrine en{' '}
+            <span className="font-serif italic text-gradient-kawaii font-normal">
+              rotation 3D
+            </span>
           </h2>
-          <p className="text-[#6E5D6E] mt-3 text-base max-w-xl mx-auto">
-            Qualité, style & plaisir — des produits qui allient utilité et fun dans une boutique physique unique à Cotonou.
+          <p className="text-[#6E5D6E] text-sm sm:text-base mt-2 max-w-xl mx-auto">
+            Faites tourner les articles à 360°, inspectez les détails et commandez en un clic via WhatsApp.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Card 1 — Mixer */}
-          <div className="feature-card glass-card-light p-7 rounded-3xl relative overflow-hidden border border-[#FF8BA7]/25 hover:border-[#FF477E]/50 transition-all duration-300 group">
-            <div className="flex items-center justify-between mb-5">
-              <span className="font-mono text-xs text-[#FF477E] uppercase tracking-wider font-bold">
-                01 • Articles Tendances
-              </span>
-              <RotateCw className="w-4 h-4 text-[#FF477E] animate-spin-slow" />
-            </div>
-            <h3 className="text-xl font-bold mb-2 text-[#2D1F2D]">Sélections Saisonnières & Exclusives</h3>
-            <p className="text-[#6E5D6E] text-sm mb-5">
-              Nos collections se renouvellent chaque saison — toujours tendance, toujours fun :
-            </p>
-
-            <div className="relative h-52 w-full flex items-center justify-center">
-              {mixerItems.map((item, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute w-full p-5 rounded-2xl border border-[#FF8BA7]/30 bg-gradient-to-br ${item.color} backdrop-blur-xl shadow-lg transition-all duration-700`}
-                  style={{
-                    transform: `translateY(${(idx - 1) * 18}px) scale(${1 - Math.abs(idx - 1) * 0.06})`,
-                    zIndex: 3 - idx,
-                    opacity: 1 - Math.abs(idx - 1) * 0.22,
-                    transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-mono text-[#FF477E] font-bold">Pépite minimi #{idx + 1}</span>
-                    <Heart className="w-4 h-4 text-[#FF477E] fill-current" />
-                  </div>
-                  <h4 className="font-bold text-sm text-[#2D1F2D]">{item.title}</h4>
-                  <p className="text-xs text-[#5C4456] mt-1 font-mono">{item.subtitle}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs text-[#6E5D6E] font-mono">
-              <span>Mise à jour toutes les 3s</span>
-              <span className="text-green-600 flex items-center gap-1 font-bold">
-                <CheckCircle2 className="w-3.5 h-3.5" /> En Stock Cotonou
-              </span>
-            </div>
-          </div>
-
-          {/* Card 2 — Typewriter / TikTok Live */}
-          <div className="feature-card glass-card-light p-7 rounded-3xl relative overflow-hidden border border-[#95D5B2]/40 hover:border-[#95D5B2]/70 transition-all duration-300 group">
-            <div className="flex items-center justify-between mb-5">
-              <span className="font-mono text-xs text-emerald-600 uppercase tracking-wider font-bold">
-                02 • TikTok Live @minimistore0
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-[10px] font-mono text-emerald-600 font-bold">DIRECT</span>
-              </div>
-            </div>
-            <h3 className="text-xl font-bold mb-2 text-[#2D1F2D]">Vidéos & Lives TikTok Officiels</h3>
-            <p className="text-[#6E5D6E] text-sm mb-5">
-              Suivez nos vidéos de déballage, découvrez les nouveautés et réservez en direct :
-            </p>
-            <div className="bg-[#1E1E2E] p-4 rounded-2xl font-mono text-xs text-[#C5F0D4] h-44 flex flex-col justify-between overflow-hidden shadow-inner">
-              <div>
-                <span className="text-white/30 block mb-2">// LIVE_FEED @MINIMISTORE0</span>
-                <p className="text-white/90 leading-relaxed">
-                  {typingText}
-                  <span className="inline-block w-2 h-[14px] bg-[#FFD166] ml-0.5 animate-pulse align-middle" />
-                </p>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-white/10 text-[10px] text-white/40">
-                <span>STATUS: 38.1K LIKES</span>
-                <span>+229 01 91 61 87 07</span>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs text-[#6E5D6E] font-mono">
-              <span>TikTok @minimistore0</span>
-              <a href="https://www.tiktok.com/@minimistore0" target="_blank" rel="noreferrer" className="text-[#FF477E] hover:underline font-bold">
-                Rejoindre →
-              </a>
-            </div>
-          </div>
-
-          {/* Card 3 — Schedule Planner */}
-          <div className="feature-card glass-card-light p-7 rounded-3xl relative overflow-hidden border border-[#C8963E]/30 hover:border-[#C8963E]/60 transition-all duration-300 group">
-            <div className="flex items-center justify-between mb-5">
-              <span className="font-mono text-xs text-[#C8963E] uppercase tracking-wider font-bold">
-                03 • Retrait Immédiat
-              </span>
-              <Clock className="w-4 h-4 text-[#C8963E]" />
-            </div>
-            <h3 className="text-xl font-bold mb-2 text-[#2D1F2D]">Click & Collect en Boutique</h3>
-            <p className="text-[#6E5D6E] text-sm mb-5">
-              Choisissez votre jour de passage à la boutique minimi, Carrefour des Policiers :
-            </p>
-            <div className="bg-[#FFF8F0] p-4 rounded-2xl border border-[#C8963E]/20 relative">
-              <div className="grid grid-cols-7 gap-1 text-center mb-3">
-                {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => (
-                  <div
-                    key={i}
-                    className={`py-2 rounded-lg text-xs font-mono transition-all duration-300 ${
-                      selectedDay === i + 1
-                        ? 'bg-gradient-to-tr from-[#FF477E] to-[#FFD166] text-white font-bold shadow-md scale-105'
-                        : 'bg-white text-[#6E5D6E] border border-[#FF8BA7]/20'
-                    }`}
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="bg-white p-2.5 rounded-xl flex items-center justify-between text-xs border border-[#C8963E]/20">
-                <span className="font-mono text-[#2D1F2D] font-bold">Boutique Policiers Cotonou</span>
-                <span className="text-green-600 font-bold">Ouvert ✨</span>
-              </div>
-              <div
-                className="absolute pointer-events-none transition-all duration-500"
-                style={{ top: '28%', left: `${(selectedDay / 7) * 82}%`, transform: cursorClicked ? 'scale(0.8)' : 'scale(1)' }}
-              >
-                <MousePointer className="w-5 h-5 text-[#FF477E] fill-[#FF477E] drop-shadow-md animate-bounce" />
-              </div>
-            </div>
-            <button
-              id="schedule-reserve-btn"
-              onClick={() => handleOrderWhatsApp('Réservation passage boutique')}
-              className="mt-5 w-full py-3 rounded-xl bg-[#FFF5F7] hover:bg-[#FFE5EC] border border-[#FF8BA7]/30 font-mono text-xs text-[#2D1F2D] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-            >
-              <span>Réserver mon passage</span>
-              <ChevronRight className="w-4 h-4 text-[#FF477E]" />
-            </button>
-          </div>
-        </div>
+        {/* The 3D Rotating Orbit Cylinder */}
+        <OrbitGallery3D items={PRODUCTS.slice(0, 8)} onSelectProduct={(p) => setSelectedProduct(p)} />
       </section>
 
-      {/* ===== D. MANIFESTO — Notre Mission ===== */}
-      <section id="manifesto" ref={manifestoRef} className="py-28 px-6 lg:px-16 bg-gradient-to-b from-[#FFF0F5] via-[#FFF8FF]/60 to-[#F0FAFF] border-y border-[#FF8BA7]/15 relative overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-8">
-          <img
-            src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=2000&q=60"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="relative z-10 max-w-5xl mx-auto">
-          <span className="manifesto-reveal inline-block font-mono text-xs text-[#FF477E] font-bold uppercase tracking-widest bg-white px-4 py-1.5 rounded-full border border-[#FF8BA7]/30 shadow-sm">
-            Notre Mission 💕
+      {/* 6. FONCTIONNALITÉS ("Artefacts Fonctionnels Interactifs") */}
+      <section ref={featuresRef} id="artefacts" className="relative py-20 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <span className="text-xs font-mono font-bold text-[#FF477E] tracking-widest uppercase">
+            Pourquoi tout le monde adore minimi
           </span>
-
-          <div className="mt-10 space-y-6">
-            <p className="manifesto-reveal text-lg sm:text-xl font-light text-[#6E5D6E] leading-relaxed max-w-3xl">
-              La plupart des boutiques proposent des articles ordinaires, sans charme ni fun pour les enfants et adolescents.
-            </p>
-            <h2 className="manifesto-reveal text-3xl sm:text-5xl lg:text-6xl font-serif italic text-[#2D1F2D] leading-tight max-w-4xl">
-              Notre mission : offrir aux familles{' '}
-              <span className="text-gradient-kawaii not-italic font-bold">
-                des produits de qualité qui allient utilité, style & plaisir
-              </span>{' '}
-              dans un univers coloré pensé pour les plus jeunes. 🌈
-            </h2>
-          </div>
-
-          <div className="manifesto-reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-14 pt-10 border-t border-[#FF8BA7]/20">
-            {[
-              { icon: <BookOpen className="w-5 h-5 text-[#FF477E]" />, title: 'Fournitures Scolaires', desc: 'Cahiers, stylos, trousses kawaii pour réussir avec style.' },
-              { icon: <Gift className="w-5 h-5 text-[#C8963E]" />, title: 'Cadeaux & Coffrets', desc: 'Gift boxes parfaites à 5.000 FCFA pour toutes occasions.' },
-              { icon: <Star className="w-5 h-5 text-[#FFD166]" />, title: 'Jouets & Accessoires', desc: 'Articles ludiques, articles de vacances & saison.' },
-              { icon: <PackageCheck className="w-5 h-5 text-green-500" />, title: 'Retrait & Livraison', desc: 'Boutique physique + livraison partout au Bénin.' },
-            ].map((item, i) => (
-              <div key={i} className="p-5 rounded-2xl bg-white border border-[#FF8BA7]/20 shadow-sm hover:-translate-y-1 transition-transform duration-200">
-                <div className="mb-3">{item.icon}</div>
-                <h4 className="font-bold text-[#2D1F2D] text-sm mb-1">{item.title}</h4>
-                <p className="text-xs text-[#6E5D6E]">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ===== E. PROTOCOL — 3 étapes sticky ===== */}
-      <section id="protocole" ref={protocolStackRef} className="py-20 px-6 lg:px-16 max-w-6xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="font-mono text-xs text-[#FF477E] font-bold uppercase tracking-widest bg-[#FFF0F5] px-4 py-1.5 rounded-full border border-[#FF8BA7]/30">
-            Le Protocole minimi
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-bold mt-4 tracking-tight text-[#2D1F2D]">
-            Commander en 3 étapes simples
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] mt-1 font-sans">
+            3 Artefacts d'expérience{' '}
+            <span className="font-serif italic font-normal text-gradient-kawaii">
+              conçus pour vous
+            </span>
           </h2>
         </div>
 
-        <div className="space-y-10">
-          {[
-            {
-              step: '01', label: 'STEP_TIKTOK', accent: '#FF477E', bg: 'from-[#FFF0F5] to-[#FFE5EC]',
-              border: 'border-[#FF8BA7]/40', icon: <Video className="w-8 h-8 text-[#FF477E]" />,
-              title: 'Découvrez nos vidéos sur @minimistore0',
-              desc: 'Regardez nos TikToks quotidiens — déballages, nouveautés, articles tendances pour enfants & ados. Repérez vos coups de cœur.',
-              canal: 'TIKTOK & CATALOGUE', etape: 'Étape 1 sur 3',
-            },
-            {
-              step: '02', label: 'STEP_WHATSAPP', accent: '#2E7D32', bg: 'from-[#E8F5E9] to-[#F0FFF4]',
-              border: 'border-[#95D5B2]/50', icon: <MessageCircle className="w-8 h-8 text-green-600" />,
-              title: 'Écrivez-nous au +229 01 91 61 87 07',
-              desc: 'Un message WhatsApp suffit ! L\'équipe minimi confirme vos articles, vous informe des disponibilités et organise votre livraison.',
-              canal: 'WHATSAPP DIRECT (+229 01 91 61 87 07)', etape: 'Étape 2 sur 3',
-            },
-            {
-              step: '03', label: 'STEP_RECEIVE', accent: '#C8963E', bg: 'from-[#FFF8E7] to-[#FFFDF9]',
-              border: 'border-[#C8963E]/40', icon: <Gift className="w-8 h-8 text-[#C8963E]" />,
-              title: 'Récupérez votre colis ou venez en boutique',
-              desc: 'Passez au Carrefour des Policiers, Cotonou — ou recevez votre commande partout au Bénin par nos livreurs rapides.',
-              canal: 'COTONOU & PARTOUT AU BÉNIN', etape: 'Étape 3 sur 3',
-            },
-          ].map((card) => (
-            <div
-              key={card.step}
-              className={`protocol-card min-h-[60vh] rounded-4xl bg-gradient-to-br ${card.bg} border ${card.border} p-8 sm:p-14 flex flex-col justify-between relative overflow-hidden shadow-xl`}
-            >
-              <div className="flex items-center justify-between z-10">
-                <span className="font-mono text-xl font-bold" style={{ color: card.accent }}>{card.step} // {card.label}</span>
-                {card.icon}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1 : Mélangeur Diagnostique */}
+          <Card3D depth={30} className="h-full">
+            <div className="feature-card h-full p-6 rounded-4xl glass-card-light border border-[#FF8BA7]/30 flex flex-col justify-between shadow-lg">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#FFF0F3] border border-[#FF8BA7]/40 flex items-center justify-center text-[#FF477E] mb-4 shadow-sm">
+                  <RotateCw className="w-6 h-6 animate-spin-slow" />
+                </div>
+                <h3 className="font-cute font-bold text-xl text-[#2D1F2D] mb-1">
+                  Mélangeur de Packs Cadeaux
+                </h3>
+                <p className="text-xs text-[#6E5D6E] mb-5">
+                  Composition dynamique mise à jour en temps réel selon les stocks disponibles.
+                </p>
+
+                {/* Vertical Cycling Stack */}
+                <div className="relative h-[160px] w-full">
+                  {mixerItems.map((item, idx) => (
+                    <div
+                      key={item.title}
+                      className={`absolute w-full p-3.5 rounded-2xl bg-gradient-to-r ${item.color} border border-white/80 shadow-md transition-all duration-500`}
+                      style={{
+                        top: `${idx * 14}px`,
+                        transform: `scale(${1 - idx * 0.05})`,
+                        zIndex: 10 - idx,
+                        opacity: 1 - idx * 0.2,
+                      }}
+                    >
+                      <h4 className="font-bold text-xs text-[#2D1F2D]">{item.title}</h4>
+                      <p className="text-[11px] text-[#6E5D6E] mt-0.5">{item.subtitle}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="my-auto z-10 max-w-xl pt-8">
-                <h3 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 text-[#2D1F2D]">{card.title}</h3>
-                <p className="text-[#5C4456] text-base leading-relaxed">{card.desc}</p>
-              </div>
-              <div className="pt-6 border-t flex items-center justify-between text-xs font-mono text-[#6E5D6E] z-10" style={{ borderColor: `${card.accent}25` }}>
-                <span>CANAL : {card.canal}</span>
-                <span className="font-bold" style={{ color: card.accent }}>{card.etape}</span>
+
+              <div className="pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs font-mono text-[#FF477E]">
+                <span>Rotation auto : 3s</span>
+                <span className="font-bold">✓ En stock</span>
               </div>
             </div>
-          ))}
+          </Card3D>
+
+          {/* Card 2 : Machine à Écrire Télémétrie */}
+          <Card3D depth={30} className="h-full">
+            <div className="feature-card h-full p-6 rounded-4xl glass-card-light border border-[#FF8BA7]/30 flex flex-col justify-between shadow-lg">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#FFF5F7] border border-[#C8963E]/40 flex items-center justify-center text-[#C8963E] mb-4 shadow-sm">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <h3 className="font-cute font-bold text-xl text-[#2D1F2D] mb-1">
+                  Télémétrie Boutique en Direct
+                </h3>
+                <p className="text-xs text-[#6E5D6E] mb-4">
+                  Flux continu d'informations et arrivages directement depuis le magasin à Cotonou.
+                </p>
+
+                {/* Monospace live terminal */}
+                <div className="p-3.5 rounded-2xl bg-[#2D1F2D] text-[#95D5B2] font-mono text-xs leading-relaxed min-h-[140px] shadow-inner relative overflow-hidden">
+                  <div className="flex items-center gap-1.5 pb-2 mb-2 border-b border-white/10 text-[10px] text-white/50">
+                    <span className="w-2 h-2 rounded-full bg-[#FF477E] animate-pulse" />
+                    <span>CANAL_DIRECT // COTONOU</span>
+                  </div>
+                  <span>{typingText}</span>
+                  <span className="inline-block w-2 h-4 bg-[#FF477E] ml-1 animate-pulse align-middle" />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs font-mono text-[#6E5D6E]">
+                <span>Status : 100% Opérationnel</span>
+                <span className="text-[#95D5B2] font-bold">● CONNECTÉ</span>
+              </div>
+            </div>
+          </Card3D>
+
+          {/* Card 3 : Planificateur Protocole Curseur */}
+          <Card3D depth={30} className="h-full">
+            <div className="feature-card h-full p-6 rounded-4xl glass-card-light border border-[#FF8BA7]/30 flex flex-col justify-between shadow-lg">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#E8F5E9] border border-[#95D5B2]/40 flex items-center justify-center text-[#95D5B2] mb-4 shadow-sm">
+                  <MousePointer className="w-6 h-6 text-[#2D1F2D]" />
+                </div>
+                <h3 className="font-cute font-bold text-xl text-[#2D1F2D] mb-1">
+                  Horaires & Retrait Magasin
+                </h3>
+                <p className="text-xs text-[#6E5D6E] mb-4">
+                  Planning d'ouverture hebdomadaire de la boutique physique.
+                </p>
+
+                {/* Weekly Grid with Simulated Cursor Click */}
+                <div className="grid grid-cols-7 gap-1.5 mb-3">
+                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-2 rounded-xl text-center font-mono text-xs font-bold transition-all duration-300 ${
+                        selectedDay === idx + 1
+                          ? 'bg-[#FF477E] text-white scale-110 shadow-md'
+                          : 'bg-white/80 text-[#6E5D6E] border border-gray-100'
+                      }`}
+                    >
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="p-3 rounded-xl bg-white/90 border border-[#FF8BA7]/20 text-xs">
+                  <div className="flex justify-between items-center text-[#2D1F2D] font-bold">
+                    <span>Lundi - Samedi :</span>
+                    <span className="font-mono text-[#FF477E]">09h00 - 20h00</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[#6E5D6E] mt-1 text-[11px]">
+                    <span>Dimanche :</span>
+                    <span className="font-mono">14h00 - 19h00</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs font-mono text-[#C8963E]">
+                <span>Carrefour des Policiers</span>
+                <span className="font-bold">Ouvert aujourd'hui</span>
+              </div>
+            </div>
+          </Card3D>
         </div>
       </section>
 
-      {/* ===== F. CATALOGUE ===== */}
-      <section id="catalogue" ref={catalogRef} className="py-24 px-6 lg:px-16 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
-          <div>
-            <span className="font-mono text-xs text-[#FF477E] font-bold uppercase tracking-widest bg-[#FFF0F5] px-4 py-1.5 rounded-full border border-[#FF8BA7]/30">
-              Showroom minimi
+      {/* 7. PHILOSOPHIE ("Le Manifeste") */}
+      <section ref={manifestoRef} className="relative py-24 px-4 bg-[#2D1F2D] text-white rounded-5xl my-12 mx-3 sm:mx-6 overflow-hidden shadow-2xl">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#FF8BA7_1px,transparent_1px)] [background-size:16px_16px]" />
+        
+        <div className="relative max-w-4xl mx-auto text-center space-y-8 z-10">
+          <span className="manifesto-reveal inline-block px-4 py-1.5 rounded-full text-xs font-mono font-bold bg-white/10 text-[#FF8BA7] border border-white/20">
+            LE MANIFESTE MINIMI
+          </span>
+
+          <h2 className="manifesto-reveal text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            La plupart des boutiques vendent du matériel ordinaire.{' '}
+            <span className="font-serif italic font-normal text-gradient-kawaii block mt-2">
+              Nous créons des étincelles de bonheur quotidien.
             </span>
-            <h2 className="text-3xl sm:text-5xl font-bold mt-4 tracking-tight text-[#2D1F2D]">
-              Les Pépites du Moment 🌈
-            </h2>
+          </h2>
+
+          <p className="manifesto-reveal text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Chaque enfant, ado et parent mérite un univers coloré et bienveillant. Des coffrets cadeaux à 5.000 FCFA jusqu’aux sacs à dos résistants, nous sélectionnons chaque pièce avec le cœur pour illuminer vos journées à Cotonou.
+          </p>
+
+          <div className="manifesto-reveal pt-4 flex justify-center gap-6 text-xs font-mono text-[#95D5B2]">
+            <div>✨ +10.000 Commandes Traitées</div>
+            <div>•</div>
+            <div>📦 Produits 100% Vérifiés</div>
+            <div>•</div>
+            <div>💕 38.1K Communauté TikTok</div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-6 md:mt-0">
-            {['Tout', 'Coffrets', 'Papeterie', 'Lifestyle', 'Sacs', 'Jouets'].map((cat) => (
+        </div>
+      </section>
+
+      {/* 8. CATALOGUE COMPLET INTERACTIF */}
+      <section ref={catalogRef} id="catalogue" className="relative py-20 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-10">
+          <span className="text-xs font-mono font-bold text-[#FF477E] tracking-widest uppercase">
+            Collection Complète
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] mt-1 font-sans">
+            Tous les Trésors{' '}
+            <span className="font-serif italic font-normal text-gradient-kawaii">
+              MiNiMi Cotonou
+            </span>
+          </h2>
+          <p className="text-sm text-[#6E5D6E] mt-2">
+            Cliquez sur un article pour le voir en 3D et passer commande directement via WhatsApp.
+          </p>
+
+          {/* Categories pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+            {categories.map((cat) => (
               <button
                 key={cat}
-                id={`filter-${cat.toLowerCase()}`}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2 rounded-full text-xs font-mono tracking-wider transition-all ${
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
                   activeCategory === cat
-                    ? 'bg-gradient-to-r from-[#FF477E] to-[#FFD166] text-white font-bold shadow-pink-glow'
-                    : 'bg-white text-[#5C4456] hover:bg-[#FFF5F7] border border-[#FF8BA7]/25 shadow-sm'
+                    ? 'bg-[#FF477E] text-white shadow-md shadow-pink-500/20 scale-105'
+                    : 'bg-white text-[#6E5D6E] border border-gray-200 hover:border-[#FF477E]'
                 }`}
               >
                 {cat}
@@ -737,207 +778,164 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+        {/* Products Grid with 3D Tilt Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="catalog-card glass-card-light rounded-3xl overflow-hidden hover:border-[#FF477E]/50 transition-all duration-300 flex flex-col"
-            >
-              <div className="relative aspect-square overflow-hidden bg-black/5">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#FF8BA7]/30 font-mono text-[10px] text-[#FF477E] font-bold shadow-sm">
-                  {product.tag}
-                </span>
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
+            <Card3D key={product.id} depth={25} onClick={() => setSelectedProduct(product)}>
+              <div className="catalog-card h-full p-4 rounded-3xl bg-white/95 backdrop-blur-md border border-[#FF8BA7]/25 shadow-lg hover:border-[#FF477E]/60 transition-all flex flex-col justify-between cursor-pointer group">
                 <div>
-                  <h3 className="font-bold text-base text-[#2D1F2D] hover:text-[#FF477E] transition-colors">{product.name}</h3>
-                  <p className="font-mono text-xl font-extrabold text-green-600 mt-1">{product.price}</p>
+                  <div className="relative w-full h-[200px] rounded-2xl overflow-hidden mb-3 bg-[#FFF5F7]">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FF477E] text-white shadow-sm">
+                      {product.badge}
+                    </span>
+                  </div>
+
+                  <span className="text-[11px] font-mono font-bold text-[#FF8BA7] uppercase tracking-wide">
+                    {product.category}
+                  </span>
+                  <h4 className="font-cute font-bold text-base text-[#2D1F2D] line-clamp-2 mt-0.5">
+                    {product.name}
+                  </h4>
                 </div>
-                <button
-                  id={`order-product-${product.id}`}
-                  onClick={() => handleOrderWhatsApp(product.name)}
-                  className="mt-5 w-full py-3 rounded-2xl bg-gradient-to-r from-[#FF477E] to-[#FFD166] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:shadow-pink-glow transition-all"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Commander via WhatsApp</span>
-                </button>
+
+                <div className="pt-3 mt-3 border-t border-[#FF8BA7]/20 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-[#6E5D6E] block font-mono">Prix MiNiMi</span>
+                    <span className="font-mono font-bold text-base text-[#C8963E]">
+                      {product.price}
+                    </span>
+                  </div>
+                  <button className="w-9 h-9 rounded-full bg-[#FFF0F3] text-[#FF477E] flex items-center justify-center group-hover:bg-[#FF477E] group-hover:text-white transition-colors shadow-sm">
+                    <ShoppingBag className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            </Card3D>
           ))}
         </div>
       </section>
 
-      {/* ===== G. BOUTIQUE + MAP ===== */}
-      <section id="boutique" className="py-24 px-6 lg:px-16 max-w-7xl mx-auto">
-        <div className="glass-card-pink rounded-5xl p-8 sm:p-14 border border-[#FF8BA7]/35 relative overflow-hidden shadow-soft-card">
-          <div className="text-center mb-12">
-            <span className="font-mono text-xs text-[#C8963E] font-bold uppercase tracking-widest bg-white px-4 py-1.5 rounded-full border border-[#C8963E]/30 shadow-sm">
-              Nous Trouver 📍
+      {/* 9. BOUTIQUE PHYSIQUE & LOCALISATION ("Le Pont") */}
+      <section id="boutique" className="relative py-20 px-4 max-w-6xl mx-auto">
+        <div className="rounded-5xl p-8 sm:p-12 bg-gradient-to-br from-white via-[#FFF5F7] to-[#FFF0F3] border-2 border-white shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E]">
+              📍 BOUTIQUE PHYSIQUE COTONOU
             </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight mt-4 mb-3 text-[#2D1F2D]">
-              Venez nous voir en boutique ! 🤎
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] leading-tight">
+              Venez nous rendre visite au{' '}
+              <span className="font-serif italic font-normal text-gradient-kawaii">
+                Carrefour des Policiers
+              </span>
             </h2>
-            <p className="text-[#6E5D6E] text-sm max-w-xl mx-auto">
-              minimi est votre boutique physique au cœur de Cotonou, Bénin. Venez découvrir nos articles en vrai !
+            <p className="text-sm sm:text-base text-[#6E5D6E] leading-relaxed">
+              Touchez les peluches, testez la papeterie pastel, composez vos propres Gift Boxes sur-mesure et rencontrez notre équipe chaleureuse !
             </p>
+
+            <div className="space-y-3 text-sm font-medium text-[#2D1F2D]">
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-[#FF8BA7]/20 shadow-sm">
+                <MapPin className="w-5 h-5 text-[#FF477E]" />
+                <span>Cotonou, Bénin — Carrefour des Policiers</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-[#FF8BA7]/20 shadow-sm">
+                <PhoneCall className="w-5 h-5 text-[#95D5B2]" />
+                <span>WhatsApp / Téléphone : +229 01 91 61 87 07</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a
+                href="https://wa.me/2290191618707?text=Bonjour%20!%20Je%20veux%20l'itinéraire%20vers%20la%20boutique%20MiNiMi%20📍"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-magnetic px-6 py-3 rounded-2xl bg-[#25D366] text-white font-bold text-sm shadow-md flex items-center gap-2"
+              >
+                <Navigation className="w-4 h-4" />
+                <span>Demander l'itinéraire WhatsApp</span>
+              </a>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-            {/* Left — Info + Itinerary */}
-            <div className="space-y-6">
-              {/* Itinerary */}
-              <div className="p-5 rounded-2xl bg-white/90 border border-[#FF8BA7]/25 shadow-sm text-sm text-[#2D1F2D] leading-relaxed space-y-2">
-                <p className="font-bold text-[#FF477E] text-base mb-3">📍 Itinéraire pas à pas depuis Ayélawadjè :</p>
-                {[
-                  'Partez du Carrefour Ayélawadjè (supermarché Le Gros).',
-                  'Tournez avant Le Gros ➔ Continuez tout droit.',
-                  'Dépassez Carrefour Sacré Cœur.',
-                  'Continuez : Carrefour Pharmacie Sènadé ➔ Carrefour Station Octogone.',
-                  <span key="5"><strong className="text-[#FF477E]">Carrefour des Policiers ➔ Boutique minimi 🤎</strong></span>,
-                ].map((step, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#FF477E]/10 text-[#FF477E] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                    <p>{step}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Contact Cards */}
-              <div className="space-y-3">
-                {[
-                  { icon: <PhoneCall className="w-5 h-5 text-[#FF477E]" />, label: 'WhatsApp / Appel', value: '+229 01 91 61 87 07', color: '#FF477E' },
-                  { icon: <MapPin className="w-5 h-5 text-green-600" />, label: 'Adresse', value: 'Carrefour des Policiers, Cotonou, Bénin', color: '#2E7D32' },
-                  { icon: <Video className="w-5 h-5 text-[#C8963E]" />, label: 'TikTok Officiel', value: '@minimistore0 — 38.1K J\'aime • 7.4K Abonnés', color: '#C8963E', link: 'https://www.tiktok.com/@minimistore0' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-[#FF8BA7]/20 shadow-sm">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${item.color}12`, border: `1px solid ${item.color}25` }}>
-                      {item.icon}
-                    </div>
-                    <div>
-                      <p className="text-[#2D1F2D] font-bold text-sm">{item.label} :</p>
-                      {item.link
-                        ? <a href={item.link} target="_blank" rel="noreferrer" className="text-[#FF477E] font-mono text-sm hover:underline">{item.value}</a>
-                        : <p className="text-[#6E5D6E] font-mono text-sm">{item.value}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                id="boutique-whatsapp-btn"
-                onClick={() => handleOrderWhatsApp('Demande de localisation boutique Cotonou')}
-                className="btn-magnetic w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF477E] to-[#FFD166] text-white font-bold text-sm uppercase tracking-wider shadow-pink-glow"
-              >
-                <div className="btn-magnetic-fill" />
-                <span className="btn-magnetic-content flex items-center justify-center gap-2">
-                  <Navigation className="w-4 h-4" />
-                  <span>Obtenir l'itinéraire exact sur WhatsApp</span>
-                </span>
-              </button>
-            </div>
-
-            {/* Right — MAP */}
-            <div className="space-y-4">
-              <div className="rounded-3xl overflow-hidden border border-[#FF8BA7]/30 shadow-xl" style={{ height: '400px' }}>
-                <iframe
-                  title="minimi boutique Cotonou localisation"
-                  src="https://www.openstreetmap.org/export/embed.html?bbox=2.3800%2C6.3400%2C2.4600%2C6.4100&layer=mapnik&marker=6.3716%2C2.4183"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 'none', borderRadius: '24px' }}
-                  allowFullScreen
-                  loading="lazy"
+          <div className="lg:col-span-6">
+            <Card3D depth={35}>
+              <div className="rounded-4xl overflow-hidden border-4 border-white shadow-2xl h-[320px] bg-white relative">
+                <img
+                  src="/hero-bg.jpg"
+                  alt="Boutique MiNiMi Cotonou"
+                  className="w-full h-full object-cover"
                 />
-              </div>
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-[#FF8BA7]/20 shadow-sm">
-                <span className="flex h-2.5 w-2.5 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF477E] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FF477E]" />
-                </span>
-                <div>
-                  <p className="font-bold text-sm text-[#2D1F2D]">📍 minimi — Carrefour des Policiers</p>
-                  <p className="text-xs text-[#6E5D6E]">Cotonou, Bénin • Boutique ouverte ✨</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-white">
+                    <p className="text-xs font-mono text-[#FF8BA7]">Concept Store Kids & Ado</p>
+                    <h4 className="font-cute font-bold text-xl">MiNiMi Store Cotonou</h4>
+                    <p className="text-xs opacity-80">Ouvert 7j/7 pour vos cadeaux et fournitures</p>
+                  </div>
                 </div>
-                <a
-                  href="https://www.openstreetmap.org/?mlat=6.3716&mlon=2.4183#map=16/6.3716/2.4183"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ml-auto text-xs font-mono text-[#FF477E] hover:underline font-bold flex-shrink-0"
-                >
-                  Ouvrir la carte →
-                </a>
               </div>
-            </div>
+            </Card3D>
           </div>
         </div>
       </section>
 
-      {/* ===== H. FOOTER ===== */}
-      <footer className="bg-[#1E1829] text-white rounded-t-[3.5rem] border-t border-[#FF8BA7]/20 pt-16 pb-10 px-6 lg:px-16 mt-12">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-white/10">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <img src="/logo-minimi.jpg" alt="minimi logo" className="w-10 h-10 rounded-full object-cover" />
-              <MinimiBrandText className="text-2xl" />
+      {/* 10. FOOTER SOMBRE CINÉMATOGRAPHIQUE */}
+      <footer className="relative bg-[#2D1F2D] text-white pt-16 pb-12 px-4 rounded-t-[3.5rem] mt-20 border-t border-white/10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          <div className="md:col-span-2 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💕</span>
+              <MinimiBrandText className="text-2xl text-white" />
             </div>
-            <p className="text-white/60 text-sm max-w-md leading-relaxed mb-2">
-              <strong className="text-white/90">minimi concept store kids & ado</strong> — une boutique dédiée aux enfants & adolescents, proposant une sélection d'articles tendances, pratiques & ludiques tout au long de l'année selon les saisons.
+            <p className="text-xs text-gray-300 max-w-md leading-relaxed">
+              Le premier concept store kids, ados et papeterie mignonne à Cotonou. Des moments de joie à portée de main dès 5.000 FCFA.
             </p>
-            <p className="text-white/50 text-xs mb-5">
-              Fournitures scolaires, sacs, gourdes, jouets, accessoires, cadeaux, articles de vacances et bien plus. Notre mission : offrir aux familles des produits de qualité qui allient utilité, style et plaisir dans un univers coloré pensé pour les plus jeunes.
-            </p>
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/25">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="font-mono text-xs text-emerald-300 font-bold">Système Opérationnel • Boutique Ouverte</span>
+            <div className="flex items-center gap-2 text-xs font-mono text-[#95D5B2]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#95D5B2] animate-pulse" />
+              <span>Système Opérationnel • Boutique & Commandes Ouvertes</span>
             </div>
           </div>
 
-          <div>
-            <h4 className="font-mono text-xs text-[#FFC5D3] uppercase tracking-widest mb-4">Navigation</h4>
-            <ul className="space-y-2.5 text-sm text-white/70">
-              {[['#features', 'Nos Univers'], ['#manifesto', 'Notre Mission'], ['#protocole', 'Commander'], ['#catalogue', 'Catalogue'], ['#boutique', 'Boutique & Map']].map(([href, label]) => (
-                <li key={href}><a href={href} className="hover:text-[#FFC5D3] transition-colors">{label}</a></li>
-              ))}
-            </ul>
+          <div className="space-y-2 text-xs">
+            <h5 className="font-mono font-bold text-[#FF8BA7] uppercase tracking-wider mb-3">
+              Navigation
+            </h5>
+            <p><a href="#3d-orbit" className="text-gray-300 hover:text-white transition-colors">Vitrine 3D</a></p>
+            <p><a href="#catalogue" className="text-gray-300 hover:text-white transition-colors">Catalogue des Produits</a></p>
+            <p><a href="#artefacts" className="text-gray-300 hover:text-white transition-colors">Expérience Interactive</a></p>
+            <p><a href="#boutique" className="text-gray-300 hover:text-white transition-colors">Localisation Magasin</a></p>
           </div>
 
-          <div>
-            <h4 className="font-mono text-xs text-[#FFC5D3] uppercase tracking-widest mb-4">Contact</h4>
-            <ul className="space-y-2.5 text-sm text-white/70 font-mono">
-              <li>📍 Carrefour des Policiers, Cotonou</li>
-              <li>📞 / 💬 +229 01 91 61 87 07</li>
-              <li>🎥 TikTok : @minimistore0</li>
-              <li>🌈 38.1K J'aime • 7.4K Followers</li>
-              <li>💕 Fait avec amour au Bénin 🇧🇯</li>
-            </ul>
+          <div className="space-y-2 text-xs">
+            <h5 className="font-mono font-bold text-[#FF8BA7] uppercase tracking-wider mb-3">
+              Contact Direct
+            </h5>
+            <p className="text-gray-300">WhatsApp : +229 01 91 61 87 07</p>
+            <p className="text-gray-300">TikTok : @minimistore0</p>
+            <p className="text-gray-300">Cotonou, Carrefour des Policiers</p>
+            <p className="text-[#C8963E] font-bold mt-2">Bénin, Afrique de l'Ouest</p>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-white/40 font-mono">
-          <p>© {new Date().getFullYear()} minimi (@minimistore0). Tous droits réservés.</p>
-          <p className="mt-2 sm:mt-0">Le mini monde le plus mignon de Cotonou 🌈</p>
+        <div className="max-w-6xl mx-auto pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4">
+          <p>© {new Date().getFullYear()} MiNiMi Concept Store. Tous droits réservés.</p>
+          <p className="font-mono text-gray-400">
+            Conçu avec Three.js • GSAP • Lenis • 1:1 Pixel Perfect
+          </p>
         </div>
       </footer>
 
-      {/* ===== I. FLOATING WHATSAPP WIDGET ===== */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2">
-        <div className="bg-white rounded-2xl px-3 py-1.5 text-xs font-mono text-[#FF477E] font-bold shadow-md border border-[#FF8BA7]/30 animate-bounce">
-          Commander 💕
-        </div>
-        <button
-          id="floating-whatsapp-btn"
-          onClick={() => handleOrderWhatsApp()}
-          className="btn-magnetic w-14 h-14 rounded-full bg-gradient-to-tr from-[#FF477E] via-[#FF8BA7] to-[#FFD166] text-white flex items-center justify-center shadow-pink-glow hover:scale-110 transition-transform"
-        >
-          <MessageCircle className="w-7 h-7 fill-current" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-400 border-2 border-white rounded-full animate-bounce" />
-        </button>
-      </div>
+      {/* 11. Interactive Product Quick-View Modal */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }
