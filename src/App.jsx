@@ -31,7 +31,7 @@ import Lenis from 'lenis';
 
 import Canvas3D from './components/Canvas3D';
 import Card3D from './components/Card3D';
-import OrbitGallery3D from './components/OrbitGallery3D';
+import ShowcaseCarousel from './components/ShowcaseCarousel';
 import ProductModal from './components/ProductModal';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -396,7 +396,7 @@ export default function App() {
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#2D1F2D]">
             <a href="#3d-orbit" className="hover:text-[#FF477E] transition-colors flex items-center gap-1">
-              <Layers className="w-3.5 h-3.5 text-[#FF477E]" /> Vitrine 3D
+              <Sparkles className="w-3.5 h-3.5 text-[#FF477E]" /> Vitrine Tendance
             </a>
             <a href="#catalogue" className="hover:text-[#FF477E] transition-colors">
               Catalogue
@@ -554,25 +554,25 @@ export default function App() {
         </div>
       </section>
 
-      {/* 5. 3D ORBIT SHOWCASE SECTION ("La Vitrine Orbitale 3D") */}
-      <section id="3d-orbit" className="relative py-20 px-4 bg-gradient-to-b from-transparent via-[#FFF0F3]/40 to-transparent">
-        <div className="max-w-5xl mx-auto text-center mb-8">
+      {/* 5. SHOWCASE CAROUSEL SECTION ("La Vitrine Vedette 120 FPS") */}
+      <section id="3d-orbit" className="relative py-16 px-4 bg-gradient-to-b from-transparent via-[#FFF0F3]/50 to-transparent">
+        <div className="max-w-5xl mx-auto text-center mb-4">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E] mb-3">
-            <Layers className="w-3.5 h-3.5" /> INTERACTION 3D EN DIRECT
+            <Sparkles className="w-3.5 h-3.5" /> VITRINE TENDANCE • 100% FLUIDE
           </span>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-[#2D1F2D] font-sans tracking-tight">
-            Explorez notre vitrine en{' '}
+            Les Meilleurs Trésors{' '}
             <span className="font-serif italic text-gradient-kawaii font-normal">
-              rotation 3D
+              MiNiMi Cotonou
             </span>
           </h2>
           <p className="text-[#6E5D6E] text-sm sm:text-base mt-2 max-w-xl mx-auto">
-            Faites tourner les articles à 360°, inspectez les détails et commandez en un clic via WhatsApp.
+            Défilement ultra-fluide au doigt sur mobile : inspectez chaque produit en 3D et commandez directement sur WhatsApp.
           </p>
         </div>
 
-        {/* The 3D Rotating Orbit Cylinder */}
-        <OrbitGallery3D items={PRODUCTS.slice(0, 8)} onSelectProduct={(p) => setSelectedProduct(p)} />
+        {/* 120 FPS Apple-style Snap Carousel */}
+        <ShowcaseCarousel items={PRODUCTS.slice(0, 8)} onSelectProduct={(p) => setSelectedProduct(p)} />
       </section>
 
       {/* 6. FONCTIONNALITÉS ("Artefacts Fonctionnels Interactifs") */}
