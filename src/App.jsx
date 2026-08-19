@@ -161,8 +161,8 @@ const GALLERY = [
   { id: 8, src: 'https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=800&q=80', alt: 'Articles vacances enfants', caption: 'Vacances ☀️' },
 ];
 
-// ——— Official MiNiMi Brand Logo (1:1 with brand identity) ———
-function MinimiLogo({ className = '', dark = false, align = 'left' }) {
+// ——— Official MiNiMi Brand Logo (Badge Image + Typography + Subtitle) ———
+function MinimiLogo({ className = '', imgSize = 'w-10 h-10', dark = false }) {
   const letters = [
     { char: 'm', color: '#FF7096' },
     { char: 'i', color: '#FFD166' },
@@ -173,33 +173,45 @@ function MinimiLogo({ className = '', dark = false, align = 'left' }) {
   ];
 
   return (
-    <div className={`flex flex-col select-none group ${align === 'center' ? 'items-center text-center' : 'items-start'} ${className}`}>
-      <div className="flex items-center leading-none">
-        <span
-          className="font-bold tracking-tight text-2xl sm:text-3xl inline-flex items-center"
-          style={{ fontFamily: '"Fredoka", "Quicksand", sans-serif' }}
-        >
-          {letters.map((l, i) => (
-            <span
-              key={i}
-              style={{ color: l.color }}
-              className="inline-block transition-transform duration-200 group-hover:-translate-y-0.5"
-            >
-              {l.char}
+    <div className={`flex items-center gap-3 select-none group ${className}`}>
+      {/* 1. Official Circular Badge Image */}
+      <img
+        src="/logo-minimi.png"
+        alt="Logo MiNiMi"
+        className={`rounded-full shadow-sm border ${
+          dark ? 'border-white/20 shadow-white/5' : 'border-[#FF8BA7]/40 shadow-pink-500/10'
+        } bg-[#FAF6EE] shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 ${imgSize}`}
+      />
+
+      {/* 2. Brand Typography + Subtitle Lockup */}
+      <div className="flex flex-col">
+        <div className="flex items-center leading-none">
+          <span
+            className="font-bold tracking-tight text-2xl sm:text-3xl inline-flex items-center"
+            style={{ fontFamily: '"Fredoka", "Quicksand", sans-serif' }}
+          >
+            {letters.map((l, i) => (
+              <span
+                key={i}
+                style={{ color: l.color }}
+                className="inline-block transition-transform duration-200 group-hover:-translate-y-0.5"
+              >
+                {l.char}
+              </span>
+            ))}
+            <span className="inline-block ml-1 text-base sm:text-lg transform group-hover:rotate-12 transition-transform duration-300">
+              🪐
             </span>
-          ))}
-          <span className="inline-block ml-1 text-base sm:text-lg transform group-hover:rotate-12 transition-transform duration-300">
-            🪐
           </span>
+        </div>
+        <span
+          className={`text-[8.5px] sm:text-[9.5px] font-mono font-bold tracking-[0.22em] uppercase mt-0.5 ${
+            dark ? 'text-gray-300' : 'text-[#6E5D6E]'
+          }`}
+        >
+          COTONOU CONCEPT STORE
         </span>
       </div>
-      <span
-        className={`text-[8.5px] sm:text-[9.5px] font-mono font-bold tracking-[0.24em] uppercase mt-0.5 ${
-          dark ? 'text-gray-300' : 'text-[#6E5D6E]'
-        }`}
-      >
-        COTONOU CONCEPT STORE
-      </span>
     </div>
   );
 }
