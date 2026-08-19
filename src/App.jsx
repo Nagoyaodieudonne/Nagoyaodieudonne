@@ -160,23 +160,36 @@ const GALLERY = [
   { id: 8, src: 'https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=800&q=80', alt: 'Articles vacances enfants', caption: 'Vacances ☀️' },
 ];
 
-// ——— minimi rainbow logo (each letter a pastel color) ———
-function MinimiBrandText({ className = '' }) {
-  const letters = [
-    { char: 'm', color: '#FF8BA7' },
-    { char: 'i', color: '#FFD166' },
-    { char: 'n', color: '#95D5B2' },
-    { char: 'i', color: '#B5A4D4' },
-    { char: 'm', color: '#FFAB76' },
-    { char: 'i', color: '#74C0FC' },
-  ];
+// ——— minimi official logo component ———
+function MinimiLogo({ className = '', imgClassName = 'w-9 h-9', showSub = true, dark = false }) {
   return (
-    <span className={`font-cute font-bold tracking-tight ${className}`}>
-      {letters.map((l, i) => (
-        <span key={i} style={{ color: l.color }}>{l.char}</span>
-      ))}
-      <span className="text-[#C8963E] text-sm align-super ml-0.5">🪐</span>
-    </span>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <img
+        src="/logo-minimi.png"
+        alt="Logo MiNiMi Concept Store"
+        className={`rounded-full shadow-sm border ${
+          dark ? 'border-white/20' : 'border-[#FF8BA7]/40'
+        } object-contain bg-[#FAF6EE] shrink-0 transition-transform duration-300 group-hover:scale-105 ${imgClassName}`}
+      />
+      <div className="flex flex-col">
+        <span
+          className={`font-cute font-bold tracking-tight text-xl leading-tight ${
+            dark ? 'text-white' : 'text-[#2D1F2D]'
+          }`}
+        >
+          minimi<span className="text-[#C8963E] text-xs align-super ml-0.5">🪐</span>
+        </span>
+        {showSub && (
+          <span
+            className={`text-[10px] font-mono tracking-wider uppercase ${
+              dark ? 'text-[#FF8BA7]' : 'text-[#6E5D6E]'
+            }`}
+          >
+            Cotonou Concept Store
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -381,16 +394,8 @@ export default function App() {
         }`}
       >
         <div className="flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2 group">
-            <span className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF8BA7] to-[#FF477E] flex items-center justify-center text-white text-base shadow-sm group-hover:scale-110 transition-transform">
-              ✨
-            </span>
-            <div className="flex flex-col">
-              <MinimiBrandText className="text-xl" />
-              <span className="text-[10px] font-mono text-[#6E5D6E] -mt-1 tracking-wider uppercase">
-                Cotonou Concept Store
-              </span>
-            </div>
+          <a href="#" className="group flex items-center">
+            <MinimiLogo imgClassName="w-10 h-10 border-[#FF8BA7]/40 shadow-sm" />
           </a>
 
           {/* Nav Links */}
@@ -821,64 +826,130 @@ export default function App() {
         </div>
       </section>
 
-      {/* 9. BOUTIQUE PHYSIQUE & LOCALISATION ("Le Pont") */}
+      {/* 9. BOUTIQUE PHYSIQUE & LOCALISATION */}
       <section id="boutique" className="relative py-20 px-4 max-w-6xl mx-auto">
-        <div className="rounded-5xl p-8 sm:p-12 bg-gradient-to-br from-white via-[#FFF5F7] to-[#FFF0F3] border-2 border-white shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-6 space-y-6">
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E]">
-              📍 BOUTIQUE PHYSIQUE COTONOU
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] leading-tight">
-              Venez nous rendre visite au{' '}
-              <span className="font-serif italic font-normal text-gradient-kawaii">
-                Carrefour des Policiers
+        <div className="rounded-5xl p-8 sm:p-12 bg-gradient-to-br from-white via-[#FFF5F7] to-[#FFF0F3] border-2 border-white shadow-2xl space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left Col: Info & Actions */}
+            <div className="lg:col-span-6 space-y-6">
+              <span className="px-3.5 py-1.5 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E] border border-[#FF8BA7]/30 inline-flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5" /> BOUTIQUE PHYSIQUE & LOCALISATION
               </span>
-            </h2>
-            <p className="text-sm sm:text-base text-[#6E5D6E] leading-relaxed">
-              Touchez les peluches, testez la papeterie pastel, composez vos propres Gift Boxes sur-mesure et rencontrez notre équipe chaleureuse !
-            </p>
 
-            <div className="space-y-3 text-sm font-medium text-[#2D1F2D]">
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-[#FF8BA7]/20 shadow-sm">
-                <MapPin className="w-5 h-5 text-[#FF477E]" />
-                <span>Cotonou, Bénin — Carrefour des Policiers</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/80 border border-[#FF8BA7]/20 shadow-sm">
-                <PhoneCall className="w-5 h-5 text-[#95D5B2]" />
-                <span>WhatsApp / Téléphone : +229 01 91 61 87 07</span>
-              </div>
-            </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] leading-tight font-sans">
+                Venez nous rendre visite au{' '}
+                <span className="font-serif italic font-normal text-gradient-kawaii">
+                  Carrefour des Policiers
+                </span>
+              </h2>
 
-            <div className="flex flex-wrap gap-3 pt-2">
-              <a
-                href="https://wa.me/2290191618707?text=Bonjour%20!%20Je%20veux%20l'itinéraire%20vers%20la%20boutique%20MiNiMi%20📍"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-magnetic px-6 py-3 rounded-2xl bg-[#25D366] text-white font-bold text-sm shadow-md flex items-center gap-2"
-              >
-                <Navigation className="w-4 h-4" />
-                <span>Demander l'itinéraire WhatsApp</span>
-              </a>
-            </div>
-          </div>
+              <p className="text-sm sm:text-base text-[#6E5D6E] leading-relaxed">
+                Notre boutique physique à Cotonou vous accueille chaque jour pour découvrir la papeterie pastel, tester les fournitures, composer vos Gift Boxes 5.000 FCFA sur-mesure ou récupérer vos commandes passées en ligne !
+              </p>
 
-          <div className="lg:col-span-6">
-            <Card3D depth={35}>
-              <div className="rounded-4xl overflow-hidden border-4 border-white shadow-2xl h-[320px] bg-white relative">
-                <img
-                  src="/hero-bg.jpg"
-                  alt="Boutique MiNiMi Cotonou"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
-                  <div className="text-white">
-                    <p className="text-xs font-mono text-[#FF8BA7]">Concept Store Kids & Ado</p>
-                    <h4 className="font-cute font-bold text-xl">MiNiMi Store Cotonou</h4>
-                    <p className="text-xs opacity-80">Ouvert 7j/7 pour vos cadeaux et fournitures</p>
+              {/* Location Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-medium text-[#2D1F2D]">
+                <div className="p-3.5 rounded-2xl bg-white/90 border border-[#FF8BA7]/25 shadow-sm space-y-1">
+                  <div className="flex items-center gap-2 text-[#FF477E] font-bold">
+                    <MapPin className="w-4 h-4 shrink-0" />
+                    <span>Adresse Boutique</span>
                   </div>
+                  <p className="text-[#6E5D6E]">
+                    Carrefour des Policiers, Cotonou, Bénin
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/90 border border-[#FF8BA7]/25 shadow-sm space-y-1">
+                  <div className="flex items-center gap-2 text-[#C8963E] font-bold">
+                    <Clock className="w-4 h-4 shrink-0" />
+                    <span>Horaires d'ouverture</span>
+                  </div>
+                  <p className="text-[#6E5D6E]">
+                    Lun - Sam : 09h-20h | Dim : 14h-19h
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/90 border border-[#FF8BA7]/25 shadow-sm space-y-1">
+                  <div className="flex items-center gap-2 text-[#95D5B2] font-bold">
+                    <Truck className="w-4 h-4 shrink-0" />
+                    <span>Livraison Express</span>
+                  </div>
+                  <p className="text-[#6E5D6E]">
+                    Cotonou, Calavi, Akpakpa en moins de 2h
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-white/90 border border-[#FF8BA7]/25 shadow-sm space-y-1">
+                  <div className="flex items-center gap-2 text-[#FF477E] font-bold">
+                    <PhoneCall className="w-4 h-4 shrink-0" />
+                    <span>Contact Direct</span>
+                  </div>
+                  <p className="font-mono text-[#2D1F2D] font-bold">
+                    +229 01 91 61 87 07
+                  </p>
                 </div>
               </div>
-            </Card3D>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <a
+                  href="https://maps.google.com/?q=Carrefour+des+Policiers+Cotonou+Benin"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-magnetic px-5 py-3 rounded-2xl bg-[#2D1F2D] text-white font-bold text-xs sm:text-sm shadow-md hover:bg-black transition-all flex items-center gap-2"
+                >
+                  <Navigation className="w-4 h-4 text-[#FF8BA7]" />
+                  <span>Ouvrir sur Google Maps</span>
+                </a>
+
+                <a
+                  href="https://wa.me/2290191618707?text=Bonjour%20!%20Je%20veux%20l'itinéraire%20vers%20la%20boutique%20MiNiMi%20📍"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-magnetic px-5 py-3 rounded-2xl bg-[#25D366] text-white font-bold text-xs sm:text-sm shadow-md shadow-green-600/20 flex items-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Itinéraire WhatsApp</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Right Col: Interactive Map & Boutique Preview */}
+            <div className="lg:col-span-6 space-y-4">
+              <Card3D depth={30}>
+                <div className="rounded-4xl overflow-hidden border-4 border-white shadow-2xl bg-white relative h-[300px] sm:h-[340px]">
+                  {/* Google Maps Embed iframe */}
+                  <iframe
+                    title="Localisation MiNiMi Cotonou"
+                    src="https://maps.google.com/maps?q=Carrefour%20des%20Policiers%2C%20Cotonou%2C%20Benin&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Floating Pin Card */}
+                  <div className="absolute top-4 left-4 z-10 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-lg border border-[#FF8BA7]/30 flex items-center gap-2.5">
+                    <img
+                      src="/logo-minimi.png"
+                      alt="MiNiMi"
+                      className="w-7 h-7 rounded-full object-contain bg-[#FAF6EE] border border-[#FF8BA7]/30"
+                    />
+                    <div>
+                      <h4 className="font-cute font-bold text-xs text-[#2D1F2D] leading-tight">
+                        Boutique MiNiMi 💕
+                      </h4>
+                      <p className="text-[10px] text-[#6E5D6E] font-mono">
+                        Carrefour des Policiers, Cotonou
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Card3D>
+            </div>
           </div>
         </div>
       </section>
@@ -887,10 +958,7 @@ export default function App() {
       <footer className="relative bg-[#2D1F2D] text-white pt-16 pb-12 px-4 rounded-t-[3.5rem] mt-20 border-t border-white/10">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">💕</span>
-              <MinimiBrandText className="text-2xl text-white" />
-            </div>
+            <MinimiLogo imgClassName="w-12 h-12 border-white/30" dark={true} showSub={true} />
             <p className="text-xs text-gray-300 max-w-md leading-relaxed">
               Le premier concept store kids, ados et papeterie mignonne à Cotonou. Des moments de joie à portée de main dès 5.000 FCFA.
             </p>
@@ -904,7 +972,7 @@ export default function App() {
             <h5 className="font-mono font-bold text-[#FF8BA7] uppercase tracking-wider mb-3">
               Navigation
             </h5>
-            <p><a href="#3d-orbit" className="text-gray-300 hover:text-white transition-colors">Vitrine 3D</a></p>
+            <p><a href="#3d-orbit" className="text-gray-300 hover:text-white transition-colors">Vitrine Tendance</a></p>
             <p><a href="#catalogue" className="text-gray-300 hover:text-white transition-colors">Catalogue des Produits</a></p>
             <p><a href="#artefacts" className="text-gray-300 hover:text-white transition-colors">Expérience Interactive</a></p>
             <p><a href="#boutique" className="text-gray-300 hover:text-white transition-colors">Localisation Magasin</a></p>
@@ -912,11 +980,17 @@ export default function App() {
 
           <div className="space-y-2 text-xs">
             <h5 className="font-mono font-bold text-[#FF8BA7] uppercase tracking-wider mb-3">
-              Contact Direct
+              Contact & Localisation
             </h5>
-            <p className="text-gray-300">WhatsApp : +229 01 91 61 87 07</p>
+            <p className="text-gray-300 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#FF8BA7]" />
+              <span>Cotonou, Carrefour des Policiers</span>
+            </p>
+            <p className="text-gray-300 flex items-center gap-1.5">
+              <MessageCircle className="w-3.5 h-3.5 text-[#95D5B2]" />
+              <span>WhatsApp : +229 01 91 61 87 07</span>
+            </p>
             <p className="text-gray-300">TikTok : @minimistore0</p>
-            <p className="text-gray-300">Cotonou, Carrefour des Policiers</p>
             <p className="text-[#C8963E] font-bold mt-2">Bénin, Afrique de l'Ouest</p>
           </div>
         </div>
