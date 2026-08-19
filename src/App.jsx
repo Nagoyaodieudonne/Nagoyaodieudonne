@@ -521,7 +521,7 @@ export default function App() {
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-[#95D5B2]" />
-                <span>Boutique Carrefour des Policiers</span>
+                <span>Boutique MiNiMi (Repère : Carrefour des Policiers)</span>
               </div>
             </div>
           </div>
@@ -734,7 +734,7 @@ export default function App() {
               </div>
 
               <div className="pt-4 border-t border-[#FF8BA7]/20 flex items-center justify-between text-xs font-mono text-[#C8963E]">
-                <span>Carrefour des Policiers</span>
+                <span>Boutique MiNiMi (Carrefour des Policiers)</span>
                 <span className="font-bold">Ouvert aujourd'hui</span>
               </div>
             </div>
@@ -886,7 +886,7 @@ export default function App() {
             </h5>
             <p className="text-gray-300 flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-[#FF8BA7]" />
-              <span>Cotonou, Carrefour des Policiers</span>
+              <span>Boutique MiNiMi (Repère : Carrefour des Policiers)</span>
             </p>
             <p className="text-gray-300 flex items-center gap-1.5">
               <MessageCircle className="w-3.5 h-3.5 text-[#95D5B2]" />

@@ -65,7 +65,7 @@ export default function SatelliteLocation() {
             Itinéraire & Vue Satellite en Direct
           </h3>
           <p className="text-xs sm:text-sm text-[#6E5D6E] mt-1">
-            Boutique physique MiNiMi • Carrefour des Policiers, Cotonou, Bénin
+            Boutique officielle <strong className="text-[#2D1F2D]">MiNiMi Store</strong> • Point de repère : Carrefour des Policiers, Cotonou
           </p>
         </div>
 
@@ -102,10 +102,10 @@ export default function SatelliteLocation() {
         <div className="lg:col-span-7">
           <Card3D depth={25}>
             <div className="relative rounded-4xl overflow-hidden border-4 border-white shadow-2xl bg-[#1A1528] h-[380px] sm:h-[430px] group">
-              {/* Google Maps Iframe (Satellite &t=k or Roadmap) */}
+              {/* Google Maps Iframe pointing directly to MiNiMi Store */}
               <iframe
                 title="Google Maps MiNiMi Cotonou"
-                src={`https://maps.google.com/maps?q=Carrefour%20des%20Policiers%2C%20Cotonou%2C%20Benin&t=${
+                src={`https://maps.google.com/maps?q=MiNiMi+Store+Carrefour+des+Policiers+Cotonou+Benin&t=${
                   mapMode === 'satellite' ? 'k' : ''
                 }&z=16&ie=UTF8&iwloc=&output=embed`}
                 width="100%"
@@ -132,7 +132,7 @@ export default function SatelliteLocation() {
                       <span className="ml-1">🪐</span>
                     </h4>
                     <p className="text-[9px] text-[#FF8BA7] font-mono tracking-wider uppercase">
-                      Carrefour des Policiers, Cotonou
+                      Boutique • Repère : Carrefour des Policiers
                     </p>
                   </div>
                 </div>
@@ -144,12 +144,17 @@ export default function SatelliteLocation() {
                 </div>
               </div>
 
-              {/* Central Pulsing Radar Beacon */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-                <span className="absolute w-20 h-20 rounded-full bg-[#FF477E]/20 animate-ping" />
-                <span className="absolute w-12 h-12 rounded-full bg-[#FF477E]/35 animate-pulse" />
-                <div className="w-5 h-5 rounded-full bg-[#FF477E] border-2 border-white shadow-lg shadow-pink-500 flex items-center justify-center text-white text-[9px] font-bold">
-                  📍
+              {/* Central Pulsing Radar Beacon on MiNiMi Store */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none flex flex-col items-center justify-center">
+                <div className="bg-[#FF477E] text-white text-[10px] font-mono font-bold px-2.5 py-1 rounded-full shadow-lg border border-white/80 mb-1 animate-bounce flex items-center gap-1">
+                  <span>🛍️ Boutique MiNiMi</span>
+                </div>
+                <div className="relative flex items-center justify-center">
+                  <span className="absolute w-20 h-20 rounded-full bg-[#FF477E]/20 animate-ping" />
+                  <span className="absolute w-12 h-12 rounded-full bg-[#FF477E]/35 animate-pulse" />
+                  <div className="w-6 h-6 rounded-full bg-[#FF477E] border-2 border-white shadow-lg shadow-pink-500 flex items-center justify-center text-white text-xs font-bold">
+                    📍
+                  </div>
                 </div>
               </div>
 
@@ -157,11 +162,11 @@ export default function SatelliteLocation() {
               <div className="absolute bottom-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-2xl bg-black/80 backdrop-blur-md border border-white/15 text-white">
                 <div className="text-xs font-mono flex items-center gap-2 pl-2">
                   <span className="text-[#FF8BA7]">📍 Destination :</span>
-                  <span className="font-bold">Carrefour des Policiers</span>
+                  <span className="font-bold">Boutique MiNiMi (Carrefour des Policiers)</span>
                 </div>
 
                 <a
-                  href="https://maps.google.com/?q=Carrefour+des+Policiers+Cotonou+Benin"
+                  href="https://maps.google.com/?q=MiNiMi+Store+Carrefour+des+Policiers+Cotonou+Benin"
                   target="_blank"
                   rel="noreferrer"
                   className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF477E] to-[#C8963E] text-white text-xs font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1.5"
