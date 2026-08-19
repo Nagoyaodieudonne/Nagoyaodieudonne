@@ -161,35 +161,45 @@ const GALLERY = [
   { id: 8, src: 'https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=800&q=80', alt: 'Articles vacances enfants', caption: 'Vacances ☀️' },
 ];
 
-// ——— minimi official logo component ———
-function MinimiLogo({ className = '', imgClassName = 'w-9 h-9', showSub = true, dark = false }) {
+// ——— Official MiNiMi Brand Logo (1:1 with brand identity) ———
+function MinimiLogo({ className = '', dark = false, align = 'left' }) {
+  const letters = [
+    { char: 'm', color: '#FF7096' },
+    { char: 'i', color: '#FFD166' },
+    { char: 'n', color: '#80ED99' },
+    { char: 'i', color: '#C77DFF' },
+    { char: 'm', color: '#FFAA5A' },
+    { char: 'i', color: '#70D6FF' },
+  ];
+
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <img
-        src="/logo-minimi.png"
-        alt="Logo MiNiMi Concept Store"
-        className={`rounded-full shadow-sm border ${
-          dark ? 'border-white/20' : 'border-[#FF8BA7]/40'
-        } object-contain bg-[#FAF6EE] shrink-0 transition-transform duration-300 group-hover:scale-105 ${imgClassName}`}
-      />
-      <div className="flex flex-col">
+    <div className={`flex flex-col select-none group ${align === 'center' ? 'items-center text-center' : 'items-start'} ${className}`}>
+      <div className="flex items-center leading-none">
         <span
-          className={`font-cute font-bold tracking-tight text-xl leading-tight ${
-            dark ? 'text-white' : 'text-[#2D1F2D]'
-          }`}
+          className="font-bold tracking-tight text-2xl sm:text-3xl inline-flex items-center"
+          style={{ fontFamily: '"Fredoka", "Quicksand", sans-serif' }}
         >
-          minimi<span className="text-[#C8963E] text-xs align-super ml-0.5">🪐</span>
-        </span>
-        {showSub && (
-          <span
-            className={`text-[10px] font-mono tracking-wider uppercase ${
-              dark ? 'text-[#FF8BA7]' : 'text-[#6E5D6E]'
-            }`}
-          >
-            Cotonou Concept Store
+          {letters.map((l, i) => (
+            <span
+              key={i}
+              style={{ color: l.color }}
+              className="inline-block transition-transform duration-200 group-hover:-translate-y-0.5"
+            >
+              {l.char}
+            </span>
+          ))}
+          <span className="inline-block ml-1 text-base sm:text-lg transform group-hover:rotate-12 transition-transform duration-300">
+            🪐
           </span>
-        )}
+        </span>
       </div>
+      <span
+        className={`text-[8.5px] sm:text-[9.5px] font-mono font-bold tracking-[0.24em] uppercase mt-0.5 ${
+          dark ? 'text-gray-300' : 'text-[#6E5D6E]'
+        }`}
+      >
+        COTONOU CONCEPT STORE
+      </span>
     </div>
   );
 }
@@ -396,7 +406,7 @@ export default function App() {
       >
         <div className="flex items-center justify-between">
           <a href="#" className="group flex items-center">
-            <MinimiLogo imgClassName="w-10 h-10 border-[#FF8BA7]/40 shadow-sm" />
+            <MinimiLogo />
           </a>
 
           {/* Nav Links */}
@@ -838,7 +848,7 @@ export default function App() {
       <footer className="relative bg-[#2D1F2D] text-white pt-16 pb-12 px-4 rounded-t-[3.5rem] mt-20 border-t border-white/10">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="md:col-span-2 space-y-4">
-            <MinimiLogo imgClassName="w-12 h-12 border-white/30" dark={true} showSub={true} />
+            <MinimiLogo dark={true} />
             <p className="text-xs text-gray-300 max-w-md leading-relaxed">
               Le premier concept store kids, ados et papeterie mignonne à Cotonou. Des moments de joie à portée de main dès 5.000 FCFA.
             </p>

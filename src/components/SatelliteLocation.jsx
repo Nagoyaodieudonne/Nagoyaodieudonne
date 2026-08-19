@@ -120,17 +120,18 @@ export default function SatelliteLocation() {
               {/* Satellite HUD Top Bar */}
               <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center pointer-events-none">
                 {/* Pin Badge */}
-                <div className="bg-[#2D1F2D]/90 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-white/20 text-white shadow-xl flex items-center gap-2.5 pointer-events-auto">
-                  <img
-                    src="/logo-minimi.png"
-                    alt="Logo MiNiMi"
-                    className="w-8 h-8 rounded-full object-contain bg-[#FAF6EE] border border-[#FF8BA7]/40 shadow-sm"
-                  />
+                <div className="bg-[#2D1F2D]/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 text-white shadow-xl flex items-center gap-2 pointer-events-auto">
                   <div>
-                    <h4 className="font-cute font-bold text-xs text-white leading-tight">
-                      Boutique MiNiMi Store 💕
+                    <h4 className="font-bold text-sm leading-tight inline-flex items-center" style={{ fontFamily: '"Fredoka", "Quicksand", sans-serif' }}>
+                      <span className="text-[#FF7096]">m</span>
+                      <span className="text-[#FFD166]">i</span>
+                      <span className="text-[#80ED99]">n</span>
+                      <span className="text-[#C77DFF]">i</span>
+                      <span className="text-[#FFAA5A]">m</span>
+                      <span className="text-[#70D6FF]">i</span>
+                      <span className="ml-1">🪐</span>
                     </h4>
-                    <p className="text-[10px] text-[#FF8BA7] font-mono">
+                    <p className="text-[9px] text-[#FF8BA7] font-mono tracking-wider uppercase">
                       Carrefour des Policiers, Cotonou
                     </p>
                   </div>
