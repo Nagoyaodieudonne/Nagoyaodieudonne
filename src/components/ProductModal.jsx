@@ -25,7 +25,7 @@ export default function ProductModal({ product, onClose }) {
     setIsOrdered(true);
 
     const message = encodeURIComponent(
-      `Bonjour MiNiMi Store Cotonou ! 💕\n\nJe souhaite commander :\n🛍️ Produit : *${product.name}*\n📦 Quantité : *${quantity}*\n💰 Prix Total : *${totalPrice}*\n🏷️ Catégorie : ${product.category}\n\n📍 Livraison : Cotonou / Calavi\nPouvez-vous me confirmer la disponibilité ? Merci ! ✨`
+      `Bonjour minimi concept store kids & ado Cotonou ! 💕\n\nJe souhaite commander :\n🛍️ Produit : *${product.name}*\n🎯 Âge recommandé : *${product.ageBadge || 'Tous âges'}*\n📦 Quantité : *${quantity}*\n💰 Prix Total : *${totalPrice}*\n🏷️ Catégorie : ${product.category}\n\n📍 Livraison : Cotonou / Calavi\nPouvez-vous me confirmer la disponibilité ? Merci ! ✨`
     );
 
     setTimeout(() => {
@@ -71,10 +71,15 @@ export default function ProductModal({ product, onClose }) {
           {/* Right: Details & Order CTA */}
           <div className="p-6 md:p-8 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FFC5D3]/50 text-[#FF477E]">
                   {product.category}
                 </span>
+                {product.ageBadge && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8F5E9] text-[#2E7D32] border border-[#95D5B2]/40">
+                    {product.ageBadge}
+                  </span>
+                )}
                 <div className="flex items-center gap-1 text-xs font-mono font-bold text-[#C8963E]">
                   <Star className="w-3.5 h-3.5 fill-[#C8963E]" /> 4.9 (Avis vérifié)
                 </div>

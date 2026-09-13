@@ -37,115 +37,190 @@ import SatelliteLocation from './components/SatelliteLocation';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ——— PRODUCTS DATA — minimi concept store kids (12 articles) ———
+// ——— PRODUCTS DATA — minimi concept store kids & ado (16 articles par tranche d'âge) ———
 const PRODUCTS = [
+  // === TRANCHE 1 : 👶 0 À 3 ANS (BÉBÉS & ÉVEIL) ===
   {
     id: 1,
-    name: 'Coffret Cadeau Kawaii 5.000 FCFA',
+    name: 'Coffret Naissance & Éveil Kawaii 5.000 FCFA',
     price: '5.000 FCFA',
     category: 'Coffrets',
-    tag: '🔥 Best-Seller TikTok',
+    ageGroup: '0-3',
+    ageBadge: '👶 0-3 ans',
+    tag: '🍼 Cadeau Naissance',
     image: '/p-giftbox.jpg',
-    badge: 'Offre Spéciale',
+    badge: 'Best-Seller 5k',
   },
   {
     id: 2,
-    name: 'Kit Papeterie Back to School',
+    name: 'Peluche Doudou Lapin Coton Douceur',
+    price: '7.500 FCFA',
+    category: 'Jouets',
+    ageGroup: '0-3',
+    ageBadge: '👶 0-3 ans',
+    tag: '🐰 Ultra Doux',
+    image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=800&q=80',
+    badge: 'Coup de ❤️',
+  },
+  {
+    id: 3,
+    name: 'Veilleuse Étoile & Nuage Silicone Doux',
+    price: '6.500 FCFA',
+    category: 'Lifestyle',
+    ageGroup: '0-3',
+    ageBadge: '👶 0-3 ans',
+    tag: '🌙 Nuit Paisible',
+    image: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80',
+    badge: 'Éveil',
+  },
+  {
+    id: 4,
+    name: 'Gourde d\'Apprentissage Silicone Bébé',
+    price: '6.000 FCFA',
+    category: 'Lifestyle',
+    ageGroup: '0-3',
+    ageBadge: '👶 0-3 ans',
+    tag: '💧 Anti-fuite',
+    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
+    badge: 'Pratique',
+  },
+
+  // === TRANCHE 2 : 🎨 4 À 7 ANS (MATERNELLE & DÉCOUVERTE) ===
+  {
+    id: 5,
+    name: 'Sac à Dos Animaux Maternelle Kawaii',
+    price: '12.500 FCFA',
+    category: 'Sacs',
+    ageGroup: '4-7',
+    ageBadge: '🎨 4-7 ans',
+    tag: '🎒 Maternelle',
+    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
+    badge: 'Maternelle',
+  },
+  {
+    id: 6,
+    name: 'Boîte à Goûter & Gourde Paille Assortie',
+    price: '9.000 FCFA',
+    category: 'Lifestyle',
+    ageGroup: '4-7',
+    ageBadge: '🎨 4-7 ans',
+    tag: '🥪 Goûter Fun',
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=80',
+    badge: 'Populaire',
+  },
+  {
+    id: 7,
+    name: 'Set Coloriage Pastel & Gommes Figurines',
+    price: '4.500 FCFA',
+    category: 'Papeterie',
+    ageGroup: '4-7',
+    ageBadge: '🎨 4-7 ans',
+    tag: '🌈 Créativité',
+    image: 'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?auto=format&fit=crop&w=800&q=80',
+    badge: 'Créatif',
+  },
+  {
+    id: 8,
+    name: 'Coffret Cadeau Anniversaire 4-7 ans 5.000 FCFA',
+    price: '5.000 FCFA',
+    category: 'Coffrets',
+    ageGroup: '4-7',
+    ageBadge: '🎨 4-7 ans',
+    tag: '🎁 Cadeau Surprise',
+    image: '/p-giftbox.jpg',
+    badge: 'Spécial 5k',
+  },
+
+  // === TRANCHE 3 : 🎒 8 À 13 ANS (KIDS & COLLÈGE / RENTRÉE) ===
+  {
+    id: 9,
+    name: 'Kit Papeterie Complet Back to School',
     price: '7.500 FCFA',
     category: 'Papeterie',
-    tag: '📚 Back to School',
+    ageGroup: '8-13',
+    ageBadge: '🎒 8-13 ans',
+    tag: '📚 Rentrée 2026',
     image: '/p-stationery.jpg',
     badge: 'Nouveauté',
   },
   {
-    id: 3,
-    name: 'Gourde Kawaii Thermos Kids',
-    price: '8.000 FCFA',
-    category: 'Lifestyle',
-    tag: '🌸 Rentrée Douce',
-    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
-    badge: 'Populaire',
-  },
-  {
-    id: 4,
-    name: 'Trousse Multi-Compartiments + Cahier',
+    id: 10,
+    name: 'Trousse Multi-Compartiments XXL & Stylos Gel',
     price: '6.500 FCFA',
     category: 'Papeterie',
+    ageGroup: '8-13',
+    ageBadge: '🎒 8-13 ans',
     tag: '✨ Organisation',
     image: 'https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=800&q=80',
     badge: 'Tendance',
   },
   {
-    id: 5,
-    name: 'Sac à Dos Kawaii Enfant',
+    id: 11,
+    name: 'Cartable & Sac d\'École Résistant 2026',
     price: '18.500 FCFA',
     category: 'Sacs',
-    tag: '🎒 Édition Limitée',
+    ageGroup: '8-13',
+    ageBadge: '🎒 8-13 ans',
+    tag: '🎒 Grand Format',
     image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-    badge: 'Édition limitée',
-  },
-  {
-    id: 6,
-    name: 'Peluche & Jouets Mignons',
-    price: '9.000 FCFA',
-    category: 'Jouets',
-    tag: '🎁 Idée Cadeau',
-    image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=800&q=80',
-    badge: 'Coup de ❤️',
-  },
-  {
-    id: 7,
-    name: 'Set Crayons & Feutres Pastel Arc-en-ciel',
-    price: '4.500 FCFA',
-    category: 'Papeterie',
-    tag: '🌈 Créativité',
-    image: 'https://images.unsplash.com/photo-1579762715118-a6f1d4b934f1?auto=format&fit=crop&w=800&q=80',
-    badge: 'Coup de ❤️',
-  },
-  {
-    id: 8,
-    name: 'Sac à Lunch Isotherme Kids',
-    price: '10.500 FCFA',
-    category: 'Lifestyle',
-    tag: '🥡 Pratique & Cute',
-    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=80',
-    badge: 'Populaire',
-  },
-  {
-    id: 9,
-    name: 'Coffret Vacances & Plage Kids',
-    price: '15.000 FCFA',
-    category: 'Coffrets',
-    tag: '☀️ Articles Vacances',
-    image: 'https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?auto=format&fit=crop&w=800&q=80',
-    badge: 'Saisonnier',
-  },
-  {
-    id: 10,
-    name: 'Stickers & Washi Tape Kawaii Pack',
-    price: '3.500 FCFA',
-    category: 'Papeterie',
-    tag: '✂️ DIY & Déco',
-    image: 'https://images.unsplash.com/photo-1614849963640-9cc74b2a826f?auto=format&fit=crop&w=800&q=80',
-    badge: 'Petit prix',
-  },
-  {
-    id: 11,
-    name: 'Mini Sac Bandoulière Ado',
-    price: '12.000 FCFA',
-    category: 'Sacs',
-    tag: '👜 Ado Tendance',
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=80',
-    badge: 'Nouveau',
+    badge: 'Édition 2026',
   },
   {
     id: 12,
-    name: 'Kit Bricolage & Créativité Kids',
-    price: '8.500 FCFA',
-    category: 'Jouets',
-    tag: '🎨 Atelier Créatif',
-    image: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=80',
-    badge: 'Éducatif',
+    name: 'Gourde Isotherme Inox 500ml Sport & École',
+    price: '8.000 FCFA',
+    category: 'Lifestyle',
+    ageGroup: '8-13',
+    ageBadge: '🎒 8-13 ans',
+    tag: '❄️ Garde au frais',
+    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=80',
+    badge: 'Isotherme',
+  },
+
+  // === TRANCHE 4 : 🎧 14 À 18 ANS (ADOS & LIFESTYLE) ===
+  {
+    id: 13,
+    name: 'Mini Sac Bandoulière Aesthetic Ado',
+    price: '12.000 FCFA',
+    category: 'Sacs',
+    ageGroup: '14-18',
+    ageBadge: '🎧 14-18 ans',
+    tag: '👜 Tendance Ado',
+    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=800&q=80',
+    badge: 'Ado Style',
+  },
+  {
+    id: 14,
+    name: 'Carnet Organisation Bullet Journal & Feutres',
+    price: '7.000 FCFA',
+    category: 'Papeterie',
+    ageGroup: '14-18',
+    ageBadge: '🎧 14-18 ans',
+    tag: '📓 Planning & Style',
+    image: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?auto=format&fit=crop&w=800&q=80',
+    badge: 'Aesthetic',
+  },
+  {
+    id: 15,
+    name: 'Gourde Thermos Gradient Pastel Ado',
+    price: '9.500 FCFA',
+    category: 'Lifestyle',
+    ageGroup: '14-18',
+    ageBadge: '🎧 14-18 ans',
+    tag: '🌸 Design Épuré',
+    image: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?auto=format&fit=crop&w=800&q=80',
+    badge: 'Look Pastel',
+  },
+  {
+    id: 16,
+    name: 'Coffret Cadeau Ado Tendance 5.000 FCFA',
+    price: '5.000 FCFA',
+    category: 'Coffrets',
+    ageGroup: '14-18',
+    ageBadge: '🎧 14-18 ans',
+    tag: '✨ Best-Seller TikTok',
+    image: '/p-giftbox.jpg',
+    badge: 'Top Tendance',
   },
 ];
 
@@ -219,6 +294,7 @@ function MinimiLogo({ className = '', imgSize = 'w-10 h-10', dark = false }) {
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tout');
+  const [activeAgeGroup, setActiveAgeGroup] = useState('all');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [mixerItems, setMixerItems] = useState([
@@ -393,10 +469,19 @@ export default function App() {
     });
   };
 
-  const filteredProducts =
-    activeCategory === 'Tout'
-      ? PRODUCTS
-      : PRODUCTS.filter((p) => p.category === activeCategory);
+  const ageGroups = [
+    { id: 'all', label: 'Tous les âges', icon: '🌈', count: PRODUCTS.length },
+    { id: '0-3', label: '0 - 3 ans', subtitle: 'Bébés & Éveil', icon: '👶', count: PRODUCTS.filter((p) => p.ageGroup === '0-3').length, desc: 'Doudous doux, veilleuses apaisantes & coffrets naissance 5.000 FCFA.' },
+    { id: '4-7', label: '4 - 7 ans', subtitle: 'Maternelle & Découverte', icon: '🎨', count: PRODUCTS.filter((p) => p.ageGroup === '4-7').length, desc: 'Petits sacs animaux, boîtes à goûter, coloriages & stickers rigolos.' },
+    { id: '8-13', label: '8 - 13 ans', subtitle: 'Kids & Rentrée Scolaire', icon: '🎒', count: PRODUCTS.filter((p) => p.ageGroup === '8-13').length, desc: 'Trousses multi-compartiments, cartables solides & kits papeterie complets.' },
+    { id: '14-18', label: '14 - 18 ans', subtitle: 'Ados & Lifestyle', icon: '🎧', count: PRODUCTS.filter((p) => p.ageGroup === '14-18').length, desc: 'Mini sacs bandoulière, bullet journals, gourdes thermos & style pastel.' },
+  ];
+
+  const filteredProducts = PRODUCTS.filter((p) => {
+    const matchesCategory = activeCategory === 'Tout' || p.category === activeCategory;
+    const matchesAge = activeAgeGroup === 'all' || p.ageGroup === activeAgeGroup;
+    return matchesCategory && matchesAge;
+  });
 
   const categories = ['Tout', 'Coffrets', 'Papeterie', 'Lifestyle', 'Sacs', 'Jouets'];
 
@@ -426,6 +511,9 @@ export default function App() {
             <a href="#3d-orbit" className="hover:text-[#FF477E] transition-colors flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-[#FF477E]" /> Vitrine Tendance
             </a>
+            <a href="#tranches-age" className="hover:text-[#FF477E] transition-colors flex items-center gap-1">
+              <span>👶</span> <span>Par Âge</span>
+            </a>
             <a href="#catalogue" className="hover:text-[#FF477E] transition-colors">
               Catalogue
             </a>
@@ -440,7 +528,7 @@ export default function App() {
           {/* Direct CTA */}
           <div className="flex items-center gap-2">
             <a
-              href="https://wa.me/2290191618707?text=Bonjour%20MiNiMi%20Store%20!%20Je%20veux%20découvrir%20vos%20articles%20💕"
+              href="https://wa.me/2290191618707?text=Bonjour%20minimi%20Store%20!%20Je%20veux%20découvrir%20vos%20articles%20💕"
               target="_blank"
               rel="noreferrer"
               onClick={triggerConfetti}
@@ -467,21 +555,22 @@ export default function App() {
             <div className="hero-animate inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#FF8BA7]/40 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-[#FF477E] animate-ping" />
               <span className="text-xs font-mono font-bold text-[#FF477E]">
-                🔥 38.1K J'AIME SUR TIKTOK • @MINIMISTORE0
+                🌈 CONCEPT STORE KIDS & ADO • TIKTOK @MINIMISTORE0
               </span>
             </div>
 
             <h1 className="hero-animate text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#2D1F2D] leading-[1.08]">
-              Le Mini Monde le plus{' '}
+              Le Concept Store{' '}
               <span className="font-serif italic font-normal text-gradient-kawaii block sm:inline">
-                mignon & magique
+                Kids & Ado
               </span>{' '}
               de Cotonou.
             </h1>
 
             <p className="hero-animate text-base sm:text-lg text-[#6E5D6E] max-w-xl font-normal leading-relaxed">
-              Boutique physique & en ligne dédiée aux trésors d'organisation :{' '}
-              <strong className="text-[#2D1F2D]">Gift Box à 5.000 FCFA</strong>, papeterie pastel, sacs tendance, jouets et gourdes kawaii pour enfants & ados.
+              Boutique dédiée aux enfants et adolescents proposant une sélection d'articles tendances, pratiques et ludiques tout au long de l'année selon les saisons :{' '}
+              <strong className="text-[#2D1F2D]">fournitures scolaires</strong>, sacs, gourdes, jouets, accessoires,{' '}
+              <strong className="text-[#FF477E]">Gift Box dès 5.000 FCFA</strong> et articles de vacances !
             </p>
 
             {/* CTAs */}
@@ -742,33 +831,107 @@ export default function App() {
         </div>
       </section>
 
-      {/* 7. PHILOSOPHIE ("Le Manifeste") */}
+      {/* 7. PHILOSOPHIE ("Le Manifeste minimi concept store kids & ado") */}
       <section ref={manifestoRef} className="relative py-24 px-4 bg-[#2D1F2D] text-white rounded-5xl my-12 mx-3 sm:mx-6 overflow-hidden shadow-2xl">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#FF8BA7_1px,transparent_1px)] [background-size:16px_16px]" />
         
         <div className="relative max-w-4xl mx-auto text-center space-y-8 z-10">
           <span className="manifesto-reveal inline-block px-4 py-1.5 rounded-full text-xs font-mono font-bold bg-white/10 text-[#FF8BA7] border border-white/20">
-            LE MANIFESTE MINIMI
+            NOTRE MISSION FAMILLE & JEUNESSE
           </span>
 
           <h2 className="manifesto-reveal text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            La plupart des boutiques vendent du matériel ordinaire.{' '}
+            Offrir aux familles des produits de qualité qui allient{' '}
             <span className="font-serif italic font-normal text-gradient-kawaii block mt-2">
-              Nous créons des étincelles de bonheur quotidien.
+              utilité, style & plaisir
             </span>
           </h2>
 
           <p className="manifesto-reveal text-sm sm:text-base text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Chaque enfant, ado et parent mérite un univers coloré et bienveillant. Des coffrets cadeaux à 5.000 FCFA jusqu’aux sacs à dos résistants, nous sélectionnons chaque pièce avec le cœur pour illuminer vos journées à Cotonou.
+            Dans un univers coloré pensé pour la jeunesse : de la petite enfance aux adolescents, minimi sélectionne avec soin des fournitures scolaires, sacs, gourdes, jouets, accessoires cadeaux et articles de vacances selon les saisons à Cotonou.
           </p>
 
-          <div className="manifesto-reveal pt-4 flex justify-center gap-6 text-xs font-mono text-[#95D5B2]">
-            <div>✨ +10.000 Commandes Traitées</div>
+          <div className="manifesto-reveal pt-4 flex flex-wrap justify-center gap-4 sm:gap-6 text-xs font-mono text-[#95D5B2]">
+            <div>👶 0 - 3 ans : Éveil Doux</div>
             <div>•</div>
-            <div>📦 Produits 100% Vérifiés</div>
+            <div>🎨 4 - 7 ans : Maternelle Fun</div>
             <div>•</div>
-            <div>💕 38.1K Communauté TikTok</div>
+            <div>🎒 8 - 13 ans : Rentrée Scolaire</div>
+            <div>•</div>
+            <div>🎧 14 - 18 ans : Mode Ado</div>
           </div>
+        </div>
+      </section>
+
+      {/* 7.5 SECTION GUIDE PAR TRANCHE D'ÂGE ("4 Mondes Adaptés") */}
+      <section id="tranches-age" className="relative py-16 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold bg-[#FF477E]/10 text-[#FF477E] border border-[#FF8BA7]/30 mb-2">
+            <Sparkles className="w-3.5 h-3.5" /> PROPOSITIONS PAR TRANCHE D'ÂGE
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-[#2D1F2D] font-sans tracking-tight">
+            À chaque âge son univers{' '}
+            <span className="font-serif italic text-gradient-kawaii font-normal">
+              de magie & d'utilité
+            </span>
+          </h2>
+          <p className="text-[#6E5D6E] text-sm sm:text-base mt-2 max-w-2xl mx-auto">
+            Sélectionnez une tranche d'âge pour découvrir nos trésors spécialement pensés pour votre enfant ou adolescent.
+          </p>
+        </div>
+
+        {/* 4 Interactive Age Cards with 3D Tilt */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {ageGroups
+            .filter((g) => g.id !== 'all')
+            .map((group) => {
+              const isSelected = activeAgeGroup === group.id;
+              return (
+                <Card3D key={group.id} depth={25}>
+                  <div
+                    className={`h-full p-6 rounded-4xl glass-card-light border transition-all duration-300 flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-[#FF477E] ring-2 ring-[#FF477E]/25 shadow-xl bg-white'
+                        : 'border-[#FF8BA7]/25 hover:border-[#FF477E]/50'
+                    }`}
+                  >
+                    <div>
+                      <div className="w-14 h-14 rounded-3xl bg-gradient-to-tr from-[#FFF0F3] to-[#FFF8F0] border border-[#FF8BA7]/30 flex items-center justify-center text-3xl mb-4 shadow-sm">
+                        {group.icon}
+                      </div>
+                      <div className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-[#FFC5D3]/40 text-[#FF477E] mb-2">
+                        {group.label}
+                      </div>
+                      <h3 className="font-cute font-bold text-xl text-[#2D1F2D] mb-1">
+                        {group.subtitle}
+                      </h3>
+                      <p className="text-xs text-[#6E5D6E] leading-relaxed mb-4">
+                        {group.desc}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-[#FF8BA7]/20">
+                      <button
+                        onClick={() => {
+                          setActiveAgeGroup(group.id);
+                          triggerConfetti();
+                          const catSection = document.getElementById('catalogue');
+                          if (catSection) catSection.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className={`w-full py-2.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-[#FF477E] text-white shadow-md'
+                            : 'bg-[#FFF5F7] text-[#FF477E] hover:bg-[#FF477E] hover:text-white border border-[#FF8BA7]/30'
+                        }`}
+                      >
+                        <span>Voir la sélection ({group.count})</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </Card3D>
+              );
+            })}
         </div>
       </section>
 
@@ -781,36 +944,93 @@ export default function App() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2D1F2D] mt-1 font-sans">
             Tous les Trésors{' '}
             <span className="font-serif italic font-normal text-gradient-kawaii">
-              MiNiMi Cotonou
+              minimi Cotonou
             </span>
           </h2>
           <p className="text-sm text-[#6E5D6E] mt-2">
             Cliquez sur un article pour le voir en 3D et passer commande directement via WhatsApp.
           </p>
 
-          {/* Categories pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                  activeCategory === cat
-                    ? 'bg-[#FF477E] text-white shadow-md shadow-pink-500/20 scale-105'
-                    : 'bg-white text-[#6E5D6E] border border-gray-200 hover:border-[#FF477E]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* 1. Age Filter Pills */}
+          <div className="mt-6 mb-3">
+            <div className="text-xs font-mono font-bold text-[#6E5D6E] mb-2">
+              🎯 1. Choisir la tranche d'âge :
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {ageGroups.map((grp) => (
+                <button
+                  key={grp.id}
+                  onClick={() => setActiveAgeGroup(grp.id)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    activeAgeGroup === grp.id
+                      ? 'bg-[#FF477E] text-white shadow-md shadow-pink-500/20 scale-105'
+                      : 'bg-white text-[#6E5D6E] border border-[#FF8BA7]/30 hover:border-[#FF8BA7]'
+                  }`}
+                >
+                  <span>{grp.icon}</span>
+                  <span>{grp.label}</span>
+                  <span className="text-[10px] opacity-75 font-mono">({grp.count})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Category Filter Pills */}
+          <div className="mt-3">
+            <div className="text-xs font-mono font-bold text-[#6E5D6E] mb-2">
+              🏷️ 2. Filtrer par type d'article :
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {categories.map((cat) => {
+                const count =
+                  cat === 'Tout'
+                    ? PRODUCTS.filter((p) => activeAgeGroup === 'all' || p.ageGroup === activeAgeGroup).length
+                    : PRODUCTS.filter(
+                        (p) => (activeAgeGroup === 'all' || p.ageGroup === activeAgeGroup) && p.category === cat
+                      ).length;
+
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      activeCategory === cat
+                        ? 'bg-[#C8963E] text-white shadow-sm font-bold scale-105'
+                        : 'bg-white text-[#6E5D6E] border border-[#C8963E]/25 hover:border-[#C8963E]'
+                    }`}
+                  >
+                    <span>{cat}</span>
+                    <span className="text-[10px] ml-1 font-mono opacity-80">({count})</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Results Counter & Reset shortcut if filtered */}
+        {(activeAgeGroup !== 'all' || activeCategory !== 'Tout') && (
+          <div className="flex items-center justify-center gap-3 mb-6 text-xs font-mono text-[#6E5D6E]">
+            <span>
+              Affichage : <strong>{filteredProducts.length}</strong> article(s) trouvé(s)
+            </span>
+            <button
+              onClick={() => {
+                setActiveAgeGroup('all');
+                setActiveCategory('Tout');
+              }}
+              className="text-[#FF477E] hover:underline font-bold"
+            >
+              ✕ Réinitialiser les filtres
+            </button>
+          </div>
+        )}
 
         {/* Products Grid with 3D Tilt Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
             <Card3D key={product.id} depth={25} onClick={() => setSelectedProduct(product)}>
-              <div className="catalog-card h-full p-4 rounded-3xl bg-white/95 backdrop-blur-md border border-[#FF8BA7]/25 shadow-lg hover:border-[#FF477E]/60 transition-all flex flex-col justify-between cursor-pointer group">
+              <div className="catalog-card h-full p-4 rounded-3xl bg-white backdrop-blur-md border border-[#FF8BA7]/35 shadow-lg hover:border-[#FF477E]/60 transition-all flex flex-col justify-between cursor-pointer group">
                 <div>
                   <div className="relative w-full h-[200px] rounded-2xl overflow-hidden mb-3 bg-[#FFF5F7]">
                     <img
@@ -818,15 +1038,24 @@ export default function App() {
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
+                      decoding="async"
                     />
                     <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FF477E] text-white shadow-sm">
                       {product.badge}
                     </span>
+                    <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8F8EF] text-[#1B6B3A] border border-[#95D5B2]/60 shadow-sm">
+                      {product.ageBadge}
+                    </span>
                   </div>
 
-                  <span className="text-[11px] font-mono font-bold text-[#FF8BA7] uppercase tracking-wide">
-                    {product.category}
-                  </span>
+                  <div className="flex items-center justify-between text-[11px] font-mono font-bold mb-1">
+                    <span className="text-[#FF8BA7] uppercase tracking-wide">
+                      {product.category}
+                    </span>
+                    <span className="text-[#6E5D6E] font-medium">
+                      {product.tag}
+                    </span>
+                  </div>
                   <h4 className="font-cute font-bold text-base text-[#2D1F2D] line-clamp-2 mt-0.5">
                     {product.name}
                   </h4>
@@ -834,7 +1063,7 @@ export default function App() {
 
                 <div className="pt-3 mt-3 border-t border-[#FF8BA7]/20 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-[#6E5D6E] block font-mono">Prix MiNiMi</span>
+                    <span className="text-[10px] text-[#6E5D6E] block font-mono">Prix minimi</span>
                     <span className="font-mono font-bold text-base text-[#C8963E]">
                       {product.price}
                     </span>
